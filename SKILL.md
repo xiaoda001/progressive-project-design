@@ -1,206 +1,310 @@
 ---
 name: progressive-project-design
-description: Plan and maintain project architecture documentation with Just-in-Time design, vertical slices, and code↔doc calibration. Use when the user asks to adopt or inspect this method, classify a new requirement or change, plan or prepare a vertical slice, determine or implement the next task from these documents, calibrate documentation against implementation, or archive a completed slice. Do not use for ordinary project setup, generic architecture questions, unrelated documentation work, or merely because a repository lacks a docs directory.
+description: Guides project architecture documentation through progressive, Just-in-Time design, with LLM-maintained code↔doc links and backlinks. Use when starting a new project, restructuring documentation, or designing project architecture — especially when the user wants to avoid Big-Design-Up-Front (BDUF), reduce documentation cognitive load, adopt a slice-driven incremental approach, or keep docs in sync with code.
 ---
 
 # Progressive Project Design
 
-Apply progressive, decision-driven documentation: write only what the current decision or vertical slice needs, then calibrate it against implementation.
+## 核心原则
 
-## Short action protocol
+渐进式设计的本质：**文档是决策的产物，不是决策的起点。** 只在需要做决策时写文档，不做决策时不写。
 
-When invoked as `$progressive-project-design <action>` or through the `$ppd` alias, parse the first action token using this table. Accept the listed Chinese and English synonyms.
+| 原则         | 说明                                             |
+| ------------ | ------------------------------------------------ |
+| Just-in-Time | 模块细节仅在实现前细化，不提前铺开               |
+| 切片驱动     | 以端到端可运行的最小闭环为设计单位，非按模块展开 |
+| 停笔点       | 每个阶段的文档写完即停，等下一个触发条件再继续   |
+| 三档深度     | L0 边界 → L1 切片所需 → L2 完整细化              |
 
-| Action | Synonyms | Behavior | Write authority |
-|---|---|---|---|
-| `状态` | `status`, `诊断`, `速览` | Inspect project, documents, active slice, drift, and evidence; report the smallest next action | Read-only |
-| `初始化` | `init`, `采用`, `迁移` | Inspect existing documentation, then create or migrate only the minimum progressive-design skeleton | Documentation writes only |
-| `需求 [内容]` | `requirement`, `新需求` | Clarify the user-observable outcome and acceptance evidence, analyze impact, and classify where the requirement belongs | Read-only; do not edit the roadmap or implement |
-| `变更 [内容]` | `change`, `change request`, `需求变更` | Assess how a proposed change affects the active slice, interfaces, data, dependencies, and verification | Read-only; apply only through a subsequent authorized action |
-| `规划` | `plan`, `切片` | Propose the next vertical slice; write it only after confirmation or delegated choice | No write before confirmation |
-| `准备 [Sx]` | `prepare [Sx]` | Prepare the named or active slice to L1 and stabilize only required decisions | Documentation writes only |
-| `下一步` | `next` | Determine and report the next implementation task from current evidence | Read-only |
-| `推进` | `go`, `continue`, `开发` | Determine, implement, and verify exactly one smallest safe unblocked task in the active slice; update related progress documentation only when materially affected | Code, tests, and related documentation for one task |
-| `校准 [Sx]` | `calibrate [Sx]`, `同步` | Compare documents with implementation evidence and update requested documents; mark D4 only after verification | Documentation writes only |
-| `归档 [Sx]` | `archive [Sx]`, `收尾 [Sx]` | Verify the completed slice is safe to remove from active context, preserve a compact summary, then move only historical slice artifacts to cold storage | Documentation moves and writes only |
-| `帮助` | `help`, omitted/unknown action | Show this action table and one-line examples; perform no project action | Read-only |
+## 首次激活检查清单
 
-Treat additional text after the action as scope or constraints. If `准备`, `校准`, or `归档` omits the slice ID, use the unique matching slice; if none or multiple match, report the ambiguity and ask for the missing choice. `需求` and `变更` end with an impact assessment and recommended route; they never silently change the active slice. For `推进`, do not start a second task in the same invocation. Stop after verification or a genuine blocker and report what changed.
+**首次**触发此 skill 时，立即执行以下检查，确保项目已具备渐进式设计的基础结构。
 
-## Operating boundaries
+**主动触发条件**（以下任一满足时自动提议此方法，无需等待用户明确要求）：
 
-Default to read-only diagnosis.
+- 项目根目录下不存在 `.ppd/` 目录
+- 项目已有 `.ppd/` 但内容为一次性铺开、没有状态标注、没有切片计划
+- 用户刚执行完 `git init` 或 `uv init` / `pnpm create` 等初始化命令
 
-- Do not create or modify files when the user asks to analyze, inspect, explain, review, suggest, run `状态`, `需求`, `变更`, or `下一步`.
-- Treat `初始化`, `准备`, `推进`, `校准`, and `归档` as explicit write authorization only within the limits in the action table.
-- Never treat a missing `docs/` directory as permission to write.
-- Preserve repository conventions and `AGENTS.md` instructions. Adapt this structure when the project already has ADR, RFC, or documentation conventions.
-- Never overwrite an existing document blindly. Read it first and make the smallest compatible change.
-- Do not modify `.gitignore` unless the skill creates a directly related generated artifact that must be ignored.
-- Stop after the artifact or implementation task required for the current action; do not pre-design later slices.
+检查清单：
 
-Before writing a document, answer: **Who reads it, when do they read it, and what decision will it support?** If any answer is unclear, do not write it yet.
+- [ ] 检查项目根目录下是否存在 `.ppd/` 目录
+  - 存在则复用
+  - 不存在 → 创建 `.ppd/`，并在内部创建子目录：`01-overview/` `02-architecture/` `03-plan/` `04-progress/` `05-modules/`（`04-progress/` 内按切片建子目录 `s1/ s2/ ...`，见"切片归档目录"）
+- [ ] 检查 `.ppd/README.md` 是否存在；不存在则创建骨架文档（含文档策略表 + 编写节奏表 + 空导航表）
+- [ ] 检查 `.gitignore` 中是否已包含 `.ppd/`；不存在则建议添加
 
-## Missing documentation bootstrap
+执行完以上检查后，**只产出骨架文档**，不多写。若为**已有项目**（代码已存在），追加执行一次逆向分析，自动生成 wiki 文档初稿：
 
-At the start of every action except `帮助`, check whether `docs/` or an equivalent established progressive-design document set exists.
+- 扫描代码产出模块清单（D 状态表，L0 登记）
+- 为已实现模块生成骨架文档（职责边界 + 接口表 + 代码位置，状态标 D4 逆向）
+- 生成项目概览草稿（基于代码推断，标注待确认项）
 
-- For `初始化`, the action itself is explicit authorization to create the minimum compatible documentation skeleton. Inspect the repository first, preserve existing conventions, and create only the files needed to establish an entry point.
-- For read-only actions such as `状态`, `需求`, `变更`, and `下一步`, complete any useful inspection that does not depend on project documents. Clearly report that the document set is absent, explain what cannot be determined, and offer the exact next command: `$progressive-project-design 初始化`. Do not create files.
-- For `规划`, `准备`, `推进`, `校准`, or `归档` when the requested work depends on a missing document set, do not bootstrap it implicitly. Pause before documentation writes and ask one concise authorization question: **“未发现项目文档目录。是否先执行 `$progressive-project-design 初始化`，然后继续当前操作？”**
-- If the user authorizes initialization in reply, treat that reply as documentation-write authority for the minimum skeleton, then resume only the originally requested action when its remaining scope is clear.
-- If a partial or differently named documentation set exists, report it and adapt or migrate through `初始化`; never create a competing `docs/` tree without authorization.
+然后进入需求确认对话（见 Step 1）。
 
-## State model
+后续项目打开时不再重复此流程，直接跳到对应步骤。
 
-Track three independent dimensions. Never combine them into one ambiguous status.
+## 状态系统
 
-### Document maturity
+### 文档成熟度（D0–D4）
 
-| State | Meaning | Transition condition |
-|---|---|---|
-| D0 | Registered only; not designed | The module or decision is only named |
-| D1 | Draft | Relevant assumptions and open questions are visible |
-| D2 | Ready to implement | Scope, interfaces, dependencies, and acceptance evidence are agreed |
-| D3 | Implementation in progress | Implementation has started and may invalidate the draft |
-| D4 | Calibrated | Current code, tests, configuration, and observed behavior have been checked against the document |
+| 状态 | 含义                       | 可信度 |
+| ---- | -------------------------- | ------ |
+| D0   | 未设计，仅登记名称或占位   | 无     |
+| D1   | 草稿，未经实现验证         | 低     |
+| D2   | 定稿，评审通过可开工       | 中     |
+| D3   | 实现中，允许被实际代码推翻 | 中     |
+| D4   | 已校准，实现完成后回写对齐 | 高     |
 
-Use `D0 -> D1 -> D2 -> D3 -> D4`. Do not mark D4 from source-name similarity or an unverified implementation. A user confirmation may satisfy D2 in a solo project; record that basis.
+### 设计深度（L0–L2）
 
-### Design depth
+| 深度        | 触发条件                 | 内容                                    |
+| ----------- | ------------------------ | --------------------------------------- |
+| L0 边界     | 项目启动或模块登记       | 一句话职责、输入输出边界、依赖关系      |
+| L1 切片所需 | 该模块首次被垂直切片涉及 | L0 + 本次切片用到的接口、数据模型、流程 |
+| L2 完整细化 | 该模块完整实现前         | L1 + 边界情况、异常处理、性能考量       |
 
-| Depth | Include |
-|---|---|
-| L0 | Responsibility, input/output boundary, dependencies |
-| L1 | L0 plus interfaces, data shape, current-slice flow, acceptance criteria |
-| L2 | L1 plus relevant edge cases, failure handling, concurrency, security, or performance constraints |
+## 文档关系模型（LLM Wiki）
 
-Use L1 as the normal implementation-ready depth. Add L2 only when the current slice actually requires it.
+本方法论的文档体系以 wiki 方式组织，关系由 LLM 自动维护：
 
-### Slice identity and execution
+| 关系     | 载体                                |
+| -------- | ----------------------------------- |
+| 导航索引 | .ppd/README.md 导航表（唯一入口）   |
+| 双向链接 | 模块文档"反向链接"区块 + 跨文档引用 |
+| 代码映射 | 接口表"代码位置"列（文件#行号）     |
+| 状态追踪 | D0-D4 状态贯穿所有文档              |
+| 依赖图谱 | 模块"依赖/被依赖"声明汇总           |
 
-Use stable IDs such as `S1`, `S2`, and keep execution state separate: `planned`, `ready`, `in-progress`, `blocked`, `calibrating`, or `done`. Do not invent forms such as `S1a` unless the repository explicitly defines them.
+管理价值：文档从"一次性写死的静态文件"变为可跳转、可追踪、与代码同频的知识网络；LLM 负责维护关系，人只负责决策。
 
-For module documents, record all dimensions explicitly:
+## 编写节奏
 
-```markdown
-> 成熟度：D2
-> 设计深度：L1
-> 所属切片：S1
-> 最后校准：—
-```
+按五个触发点组织，每步产出物即停，不要跨越：
 
-## Route by user intent
+| 节奏        | 触发条件           | 产出物                                                     | 数量参考   |
+| ----------- | ------------------ | ---------------------------------------------------------- | ---------- |
+| 1. 骨架     | 项目初始化         | 主索引 README：空导航表 + D/L 状态约定 + 编写节奏表        | 1 篇       |
+| 2. 需求     | 需求确认后         | 项目概览：定位、边界、关键决策、明确不做清单               | 1 篇       |
+| 3. 切片启动 | 每个切片开工前一周 | 技术选型定稿 + 该切片涉及的模块 L1 设计 + 路线图切片登记   | 2-4 篇     |
+| 4. 实现中   | 每次变更           | 开发日志（3-5 行变更摘要 + 决策原因 + 遗留事项）           | 随变随写   |
+| 5. 校准     | 切片完成           | 回写模块文档状态 D3→D4，补充被实现推翻的设计，同步代码链接 | 更新不新增 |
 
-### Diagnose or summarize
+## 切片归档目录
 
-1. Inspect existing project instructions and documentation without writing.
-2. Read `docs/README.md`, overview, roadmap, module index, and technology decisions when present.
-3. Report what exists, inconsistencies, missing evidence, active slice, and the smallest useful next action.
-4. If this documentation system is absent, offer initialization; do not perform it automatically.
-
-### Initialize or adopt
-
-1. Inspect existing documentation before proposing a structure.
-2. If `docs/` already contains material, read [references/migration.md](references/migration.md) and preserve it.
-3. Create only missing directories and the smallest index skeleton authorized by the user.
-4. Do not write the project overview until target users, deployment boundary, core user path, and explicit non-goals are known or reasonably discoverable.
-5. Read [references/templates.md](references/templates.md) only for artifacts being created.
-
-Recommended structure; adapt rather than force it:
+`.ppd/04-progress/` 按切片组织，每个切片一个子目录（`s1/ s2/ ...`），切片在 roadmap 登记（节奏 3）时即创建该目录：
 
 ```text
-docs/
-├── README.md
-├── 01-overview/project-overview.md
-├── 02-architecture/tech-stack.md
-├── 03-plan/roadmap.md
-├── 04-progress/<slice-id>-log.md
-├── 05-modules/README.md
-└── 99-archive/README.md
+.ppd/04-progress/
+├── s1/                       # 该切片全部开发日志 + 切片回顾
+│   ├── 2026-08-19-xxx.md     # 开发日志（节奏 4，直接写入所属切片目录）
+│   └── S1-2026-08-19-回顾.md  # 切片回顾（校准节奏归档，与日志同目录）
+└── s2/                       # 下一个切片 ...
 ```
 
-Create `99-archive/` only when the first slice is actually archived.
+约定：
 
-### Define a vertical slice
+- **切片内聚**：日志与回顾同目录共存，检索/排查按切片目录定位
+- **主索引轻维护**：`.ppd/README.md` 导航表 04 分类只维护到目录级链接（每切片一个链接 + 回顾文件链接），不逐文件登记
+- **跨文档引用**：模块文档反向链接、roadmap 归档链接统一用 `../04-progress/<切片>/<文件>.md`
+- **.ppd 自身管理日志**（非业务切片变更，如目录结构调整）落在 `04-progress/` 根目录，不占切片目录
 
-1. Identify one user-observable outcome and the shortest end-to-end path that proves it.
-2. Propose up to three candidate slices when the boundary is uncertain.
-3. Require an observable acceptance criterion, involved modules, dependencies, and exclusions.
-4. Prefer one-way dependencies and the lightest implementation that exercises the core path.
-5. Write the selected slice to the roadmap only after the user confirms it or explicitly delegates the choice.
+## 工作流程
 
-### Handle new requirements and changes
+### 阶段一：确认需求（节奏 2 触发点）
 
-Do not inject a new request directly into an `in-progress` slice. First identify the user-observable outcome, acceptance evidence, affected modules and interfaces, dependencies, exclusions, and whether the request invalidates an existing decision.
+在写任何文档前，通过对话锁定边界决策。从以下 4 个维度中选取**与项目类型相关**的提问，不必全部问完：
 
-Classify it as exactly one of:
+**通用维度（必问）：**
 
-- **Clarification**: makes an existing acceptance criterion precise without expanding the outcome; recommend updating the current slice through `规划` or `准备`.
-- **Small extension**: expands the current outcome but preserves its dependency direction and verification path; recommend inclusion only after the user confirms the scope change.
-- **Independent capability**: delivers a separately observable outcome; recommend a new later slice.
-- **Cross-cutting change**: alters shared architecture, data, security, operations, or multiple planned slices; report affected decisions and recommend replanning before implementation.
-- **Defect**: observed behavior violates an already accepted criterion; treat it as repair work rather than a new requirement, and route implementation through `推进` only when it is the smallest safe task in the active slice.
+- **目标用户**：谁用这个系统？终端用户 / 内部团队 / 开发者
+- **部署形态**：单机本地 / 公开 Web 服务 / 团队自托管
 
-Keep an `in-progress` slice stable unless the change is necessary to satisfy its existing acceptance criterion or the user explicitly accepts the revised scope and tradeoffs. After classification, recommend one next action: `规划`, `准备 [Sx]`, `推进`, or no project change. Do not edit documents or code during `需求` or `变更`.
+**按项目类型选问：**
 
-### Prepare a slice for implementation
+- **数据密集型项目**：数据存储在哪？本地自托管 / 云端 / 混合
+- **AI 项目**：模型在哪跑？本地 / 云端 API / 两者可切换；处理什么输入？纯文本 / 多模态 / 结构化数据
+- **业务系统项目**：核心实体是什么？用户流程是怎样的？需要什么角色权限
 
-Run when the user says a slice is about to start or asks to prepare it; do not rely on a calendar phrase such as “one week before.”
+**确认后才写概览**，不确认不写。
 
-1. Move the slice from `planned` to `ready` only when acceptance evidence and dependencies are clear.
-2. Stabilize only the technology decisions needed by this slice.
-3. Design only involved modules to L1; add L2 selectively.
-4. Mark documents D2 when ready, then D3 when implementation actually starts.
+**业界方案建议**：需求确认后、写概览前，agent 基于业界实践提出 2-3 个可选方案（技术选型 / 架构形态 / 功能范围），说明取舍与适用场景，由用户选择后再落笔。用户想法为主导，业界建议为参照，不替用户做决定。
 
-### Record implementation changes
+### 阶段二：确定垂直切片
 
-Record only changes that affect architecture, interfaces, data models, slice scope, operational behavior, or key decisions. Prefer one append-only log per slice. Skip formatting changes, spelling fixes, routine tests, and behavior-preserving local refactors.
+切片是端到端可运行的最小闭环，横跨多个模块但只有一个数据流：
 
-### Archive a completed slice
+```
+按模块拆（BDUF）：
+  模块A 设计 → 模块B 设计 → 模块C 设计 → 实现
 
-Treat archives as cold historical evidence, not a second source of current truth.
+按切片拆（渐进）：
+  切片1（最小闭环）设计+实现 → 切片2 设计+实现 → ...
+```
 
-1. Require the slice to be `done`, its observable acceptance criterion to have passed, affected documents to be calibrated to D4, and no unresolved blocker to remain. Implementation existing by itself is insufficient.
-2. Confirm every still-valid interface, data constraint, architecture rule, operational behavior, and reusable decision remains in an active module, architecture, ADR/RFC, or overview document. Never archive the only current source of truth.
-3. Read the archive templates in [references/templates.md](references/templates.md). Create one compact summary and an archive index entry, then move only slice-specific plans, logs, superseded drafts, resolved issue records, and bulky historical evidence under `99-archive/slices/<slice-id>/`.
-4. Keep a compact `done / archived` row and summary link in the active roadmap. Remove archived files from active navigation and select the next active slice when one exists.
-5. Preserve repository history and links where practical. Do not delete evidence, archive shared current module documents, or rewrite native ADR/RFC history merely to fit this layout.
-6. If any gate fails, do not archive. Report the missing calibration, evidence, decision, or document promotion as the smallest next action.
+切片划分标准：
 
-`状态` and `校准` may recommend an eligible archive but must not perform it. Archive only through explicit `归档` authorization.
+- 每个切片独立可验证（能跑通、能展示）
+- 切片间的依赖关系尽量单向
+- 第一个切片选择"最短路径"——覆盖最多核心模块但实现最轻
 
-### Use cold context
+### 阶段三：延迟细化（节奏 3 触发点）
 
-Do not recursively scan or read archive bodies during routine `状态`, `规划`, `准备`, `下一步`, `推进`, or `校准` actions. Read only the archive index when active evidence is insufficient and history is plausibly relevant.
+只有切片启动前一周才：
 
-Escalate retrieval progressively:
+1. **定稿技术选型**：从 D1 升到 D2，锁定版本
+2. **细化模块设计**：根据切片需要，写涉及的模块 L1 文档
+3. **登记切片路线图**：在 roadmap 中记录切片名称、覆盖模块、目标
 
-1. Inspect current code, tests, configuration, and active documents.
-2. Read `99-archive/README.md` only when a regression, migration, compatibility rule, legacy configuration, unexplained constraint, or explicit history request points to past work.
-3. Read matching slice summaries.
-4. Read detailed archived plans or logs only if the summary does not answer the question.
+**不涉及的模块全程 D0，不碰不写。**
 
-In a CodeGraph-indexed repository, inspect current implementation and call paths with CodeGraph before using archived explanations. Treat current evidence as authoritative when it conflicts with history, and report the drift.
+### 阶段四：写日志不写设计（节奏 4）
 
-### Calibrate or determine the next task
+实现期间只记录变更日志（3-5 行），不新增设计文档。设计变更通过日志留痕，等校准阶段再回写。日志是问题排查的第一线索——"决策与原因"记录为何如此实现，"遗留事项"记录已知问题。
 
-1. Read the active slice, its acceptance criteria, involved module documents, and dependencies.
-2. Inspect implementation, tests, configuration, migrations, and runnable entry points. In a CodeGraph-indexed repository, use CodeGraph first as repository instructions require.
-3. Classify evidence as:
-   - **complete**: implementation exists and verification evidence passes;
-   - **possibly complete**: implementation exists but verification is missing;
-   - **next**: in the active slice, unimplemented, and dependencies are ready;
-   - **blocked**: dependency or user decision is missing;
-   - **document drift**: implementation and D1-D3 documentation disagree.
-4. Update documents only if the selected action authorizes it. Mark D4 only after evidence-based comparison.
-5. Mark the slice `done` only when its observable acceptance criterion is satisfied.
-6. When the slice is eligible for cold storage, recommend `归档 [Sx]`; do not load unrelated archives to make that recommendation.
+**归档**：切片完成（校准节奏）时，把该切片期间的开发日志汇总为切片回顾（`.ppd/04-progress/<切片>/<切片>-<日期>-回顾.md`，与该切片日志同目录），保证日志可检索、不丢失；涉及接口/模型变化的日志同步更新模块文档的"代码位置"链接与反向链接。
 
-## Output discipline
+### 阶段五：校准（节奏 5）
 
-- Clearly distinguish facts found in files from inferences.
-- Report missing files as missing; do not assume their contents.
-- Preserve existing naming and language where practical.
-- Prefer small updates over creating parallel documents.
-- Use [references/templates.md](references/templates.md) for stable field shapes, but follow established repository templates when they conflict.
+切片实现完成后：
+
+1. 验证设计文档与实际代码的偏差
+2. 更新模块文档状态 D3 → D4
+3. 回写被推翻的设计决策
+4. **不扩写**——D4 只对齐，不增加范围
+5. **同步代码映射**：更新切片涉及模块文档接口表的"代码位置"列与"反向链接"区块，确保文档与代码可双向跳转
+
+**LLM 自动同步**：校准阶段由 agent 自动执行——扫描 `git diff` 与代码符号（端点/模型/函数），与 L1 文档接口清单比对：
+
+- 接口已实现且文档已登记 → 补齐代码位置链接，状态转 D4
+- 接口已实现但文档未登记 → 先补登记再置 D4，防止文档滞后
+- 文档已登记但代码已移除 → 标记为被推翻的设计，回写决策
+
+## 反模式
+
+| 反模式                   | 问题                             | 正确做法                                      |
+| ------------------------ | -------------------------------- | --------------------------------------------- |
+| 一次性铺开全部模块设计   | 认知过载，设计未经实现验证       | 只写当前切片需要的模块 L1                     |
+| 同时写概览+架构+全部模块 | 身份不清（读者/时机/用途不明确） | 先确认需求 → 写概览 → 停笔                    |
+| 模块文档写到 L2 再开工   | L2 细节大概率被实现推翻          | L1 就够开工，L2 实现前一并细化                |
+| 实现完成后不管文档       | 文档迅速过时变废纸               | 校准节奏回写 D3→D4                            |
+| 切片不定义可验证标准     | 分不清切片是否做完               | 每个切片定义"能跑通什么"作为完成条件          |
+| 开发中忘记下一步做什么   | 原地打转或凭记忆猜测优先级       | 运行开发任务导航章节，基于文档+代码推导下一步 |
+
+## 开发任务导航
+
+当用户问"下一步做什么"时，按以下流程诊断并输出可执行的任务清单。
+
+### Step 1: 读取切片计划
+
+读取 `.ppd/03-plan/roadmap.md`，确定当前正在进行的切片及其覆盖模块。
+
+### Step 2: 扫描模块 L1 文档
+
+读取当前切片涉及的模块文档（`.ppd/05-modules/` 下标记为 S1a/S1b 等状态的 .md 文件），提取：
+
+- 已声明的对外接口清单
+- 已声明的数据模型
+- 依赖关系（哪些模块需先完成）
+
+### Step 3: 比对代码实现
+
+扫描项目代码，与 L1 文档中的接口清单逐条比对：
+
+- **已实现**：接口存在，跳过
+- **未实现但有依赖未就绪**：标记为阻塞，暂不推进
+- **未实现且依赖已就绪**：标记为下一步候选
+
+### Step 4: 按依赖排序输出
+
+整理为下一步任务清单，格式：
+
+```
+当前切片：[切片名]
+切片完成条件：[L1 文档中定义的切片验收标准]
+
+已完成：
+- [x] 接口A（代码已存在）
+- [x] 接口B（代码已存在）
+
+下一步：
+1. [优先级最高] 接口C — L1 文档已定义，代码不存在，无依赖阻塞
+2. [次优先] 接口D — 需要先完成接口C
+
+阻塞中：
+- 接口E — 等待模块X完成（该模块不在当前切片）
+```
+
+### 特殊情况
+
+- **无进行中的切片**：切换到节奏 2（需求确认）或节奏 3（切片启动前细化）
+- **切片内所有接口均已实现**：声明切片可进入校准节奏，建议用户启动下一个切片
+- **代码比 L1 文档多**（有接口已实现但未登记）：先更新文档 D4（补登记接口与代码位置）再继续，防止文档滞后
+- **接口已实现但代码位置未登记**：补齐代码链接再继续，保持双向链接有效
+
+## 问题排查导航
+
+当出现 bug 或异常行为时，按以下顺序回溯：
+
+1. 定位现象涉及的模块 → 读取 .ppd/05-modules/<模块>.md 的接口表与职责边界
+2. 检索 .ppd/04-progress/<切片>/ 开发日志（按切片目录定位，查同目录回顾）：查"决策与原因"（为何如此实现）与"遗留事项"（已知问题）
+3. 沿"代码位置"链接直达实现代码，比对文档描述与实际行为
+4. 修复后按节奏 4 写日志（记录根因），供后续排查复用
+
+## 项目速览
+
+当用户问"这个项目是什么状态"或打开一个已有项目时，执行以下速览流程：
+
+1. **读取 .ppd/README.md**：获取文档策略与编写节奏约定
+2. **读取 .ppd/01-overview/project-overview.md**：定位、边界、关键决策
+3. **读取 .ppd/03-plan/roadmap.md**：切片计划与当前进度
+4. **读取 .ppd/05-modules/README.md**：各模块 D 状态表
+5. **读取 .ppd/02-architecture/tech-stack.md**（如存在）：技术选型
+
+汇总输出：
+
+```
+项目：[名称]
+定位：[从 overview 提取的一句话]
+当前阶段：[从 roadmap 提取的切片状态]
+完成度：S1a [进行中] / S1b [未开始] ...
+
+模块可信度：
+  ├ 账号与权限    D3 实现中（参考文档可用）
+  ├ 文档管理       D1 草稿（未经验证）
+  └ 知识库引擎     D0（未设计）
+
+下一步可以做什么：
+  当前切片未完成事项（见开发任务导航）
+```
+
+如果 .ppd/ 目录不存在或大部分文档缺失，提示用户当前项目尚未进行渐进式设计初始化，建议运行首次激活流程。
+
+## 已有项目适配（逆向校准）
+
+当项目已有代码且 `.ppd/` 缺失或过时时，读取 [references/migration.md](references/migration.md)，按其中的逆向校准流程适配。只在处理存量项目时读取该文件。
+
+保留三个核心约定：
+
+- 以当前代码为事实来源，已实现但未文档化的模块先标记为 D4（逆向）
+- 存量项目的切片是“文档化 + 校准”闭环，不重复设计已实现功能
+- 首个切片选择覆盖核心数据流且文档量最少的最短路径
+
+## 文档模板参考
+
+创建或更新 `.ppd/` 文档时，按需读取 [references/templates.md](references/templates.md) 中与当前产出物对应的单个模板。不要为了创建一种文档加载无关模板，也不要在已有项目规范可复用时另建竞争性文档。
+
+## 判断标准
+
+写任何一篇文档前，先回答三个问题。答不上来 → 这篇文档不该现在写：
+
+> **谁读？什么时候读？读了要做什么决定？**
+
+示例：
+
+- "这篇模块文档以后可能会有人看" → 不写
+- "下周一实现这个模块的开发人员要确定接口参数" → 写 L1
+
+## 相关
+
+- 这是方法论文档，不绑定任何技术栈

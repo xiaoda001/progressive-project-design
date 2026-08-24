@@ -2,63 +2,65 @@
 
 [简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
-A progressive project-design Skill for AI coding agents. It combines Just-in-Time Design, vertical slices, and code-to-document calibration to keep evolving projects clear, actionable, and free from unnecessary up-front design.
+A progressive project-design Skill for AI coding agents. It combines Just-in-Time Design, vertical slices, and code↔document calibration so documentation evolves with implementation without turning into Big Design Up Front.
 
-## Purpose
+## Core principles
 
-Large up-front documents quickly drift once implementation begins and burden agents with irrelevant context. Progressive Project Design prepares only the information required for the current decision and vertical slice, then calibrates the documentation against code, tests, configuration, and observed runtime behavior.
+> Documentation is an output of decisions, not their starting point.
 
-Use it to:
+- **Design on demand:** Detail only what the current decision or slice needs.
+- **Slice-driven delivery:** Design around the smallest runnable, verifiable end-to-end loop.
+- **Stop at the current artifact:** Do not pre-design later scope.
+- **Calibrate after implementation:** Update documents from code, tests, configuration, and observed behavior.
+- **Maintain two-way relationships:** Record code locations, dependencies, and backlinks in module documents.
 
-- establish lightweight, evolvable architecture documentation for a new project;
-- migrate an existing project while preserving its ADRs, RFCs, and documentation conventions;
-- split requirements into observable, testable end-to-end slices;
-- identify and advance one smallest safe task at a time;
-- detect drift between implementation and design documentation;
-- archive completed slice history to reduce active-context noise.
+## State model
 
-## Core capabilities
-
-### Short-action workflow
-
-| Action | Purpose |
+| Dimension | States |
 |---|---|
-| `status` / `状态` | Read-only inspection of the project, documents, active slice, drift, and evidence |
-| `init` / `初始化` | Create or migrate the minimum progressive-documentation skeleton |
-| `requirement` / `需求` | Clarify the observable outcome and classify a requirement |
-| `change` / `变更` | Analyze impact on slices, interfaces, data, and dependencies |
-| `plan` / `规划` | Plan the next vertical slice |
-| `prepare [Sx]` / `准备 [Sx]` | Prepare a selected slice for implementation |
-| `next` / `下一步` | Determine the smallest implementation task from current evidence |
-| `go` / `推进` | Implement and verify one smallest safe, unblocked task |
-| `calibrate [Sx]` / `校准 [Sx]` | Update documentation against implementation evidence |
-| `archive [Sx]` / `归档 [Sx]` | Verify completion and archive historical slice artifacts |
+| Document maturity | `D0` registered → `D1` draft → `D2` ready → `D3` implementing → `D4` calibrated |
+| Design depth | `L0` boundary → `L1` current-slice detail → `L2` full relevant detail |
 
-### Three-dimensional state model
+L1 is normally enough to start implementation. Use L2 only when the current work needs edge cases, failure handling, performance, or similar constraints.
 
-- Document maturity: `D0` (registered) through `D4` (calibrated against implementation).
-- Design depth: `L0` (boundary) through `L2` (relevant non-functional constraints).
-- Slice execution: `planned`, `ready`, `in-progress`, `blocked`, `calibrating`, or `done`.
+## Project documentation
 
-### Evidence-driven calibration and cold archives
+The Skill uses `.ppd/` as its progressive-documentation entry point:
 
-A document reaches `D4` only after code, tests, configuration, migrations, and runnable entry points have been checked. Completed slice material can move into cold storage; routine work reads active truth first and loads history only when regressions, compatibility, migrations, or past decisions make it relevant.
+```text
+.ppd/
+├── README.md
+├── 01-overview/
+├── 02-architecture/
+├── 03-plan/
+├── 04-progress/<slice>/
+└── 05-modules/
+```
 
-## Benefits
+On first use, it checks existing structure and creates only the necessary skeleton. Existing codebases use reverse calibration: extract modules, interfaces, data models, and dependencies from current implementation, then document one slice at a time.
 
-- Reduces over-design by preparing only the L1 information needed by the current slice.
-- Keeps active context compact by moving completed history into cold archives.
-- Controls documentation drift through implementation and verification evidence.
-- Protects in-progress work by classifying requirement changes before changing scope.
-- Adapts to existing README, ADR, RFC, roadmap, and module conventions.
-- Separates read-only analysis, documentation writes, and code implementation authority.
-- Keeps each vertical slice tied to an observable outcome and acceptance evidence.
+## Five-stage rhythm
+
+| Stage | Trigger | Output |
+|---|---|---|
+| Skeleton | Project initialization | `.ppd/README.md` and minimum directories |
+| Requirements | Boundaries are confirmed | Positioning, scope, decisions, and non-goals |
+| Slice start | A slice is ready to begin | Required technology choices, module L1 documents, roadmap entry |
+| Implementation | A meaningful change occurs | Short log, decision reason, and remaining issues |
+| Calibration | Slice implementation finishes | D3→D4, code locations, deviations, and backlinks |
+
+## Use cases
+
+- Establish lightweight, evolvable architecture documentation.
+- Adopt the method in an existing project while preserving README, ADR, and RFC conventions.
+- Plan verifiable end-to-end vertical slices.
+- Determine the next task from the roadmap, module L1 documents, and code.
+- Investigate drift between implementation and documentation.
+- Summarize a finished slice and calibrate affected modules.
 
 ## Installation
 
-The repository root is a complete [Agent Skills](https://agentskills.io/) directory. `SKILL.md` is the shared entry point, `references/` is loaded on demand, and `agents/openai.yaml` adds optional Codex UI metadata.
-
-Clone the repository into your agent's global Skill directory:
+The repository root is a complete [Agent Skills](https://agentskills.io/) directory. Clone it into the global Skill directory used by your agent:
 
 | Agent | Windows | macOS / Linux |
 |---|---|---|
@@ -68,39 +70,40 @@ Clone the repository into your agent's global Skill directory:
 | TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
 | TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
 
-PowerShell example for Codex:
+PowerShell example:
 
 ```powershell
 git clone https://github.com/xiaoda001/progressive-project-design.git `
   "$env:USERPROFILE\.codex\skills\progressive-project-design"
 ```
 
-macOS / Linux example for Qoder:
+macOS / Linux example:
 
 ```bash
 git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.qoder/skills/progressive-project-design
+  ~/.claude/skills/progressive-project-design
 ```
 
-Restart the agent or refresh its Skill discovery. Qoder CLI supports `/skills reload`. To update an installed copy:
+Restart the agent or refresh Skill discovery. Update an installed copy with:
 
 ```bash
-git -C <skill-directory>/progressive-project-design pull --ff-only
+git -C <agent-skill-directory>/progressive-project-design pull --ff-only
 ```
 
-## Usage
+## Usage examples
 
 ```text
-$progressive-project-design status
-$progressive-project-design init
-$progressive-project-design requirement Add team invitations
-$progressive-project-design prepare S1
-$progressive-project-design go
-$progressive-project-design calibrate S1
-$progressive-project-design archive S1
+$progressive-project-design Inspect this project's progressive-design state and report the smallest next step
+$progressive-project-design Create the minimum .ppd skeleton for this new project
+$progressive-project-design Plan the next vertical slice from the current roadmap
+$progressive-project-design Calibrate the module documents affected by the current slice
 ```
 
-Start with `status` in an existing project. If the progressive documentation set is absent, explicitly run `init`. In Claude Code, use `/progressive-project-design status`; matching requests can also load the Skill automatically.
+In Claude Code, use the slash form:
+
+```text
+/progressive-project-design Inspect the current project state
+```
 
 ## Repository structure
 
@@ -108,9 +111,13 @@ Start with `status` in an existing project. If the progressive documentation set
 progressive-project-design/
 ├── SKILL.md
 ├── agents/openai.yaml
-└── references/
-    ├── migration.md
-    └── templates.md
+├── references/
+│   ├── migration.md
+│   └── templates.md
+├── README.md
+├── README.en.md
+├── README.ja.md
+└── README.ko.md
 ```
 
 ## License

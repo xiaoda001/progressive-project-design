@@ -2,56 +2,56 @@
 
 [简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
-AI 코딩 에이전트를 위한 점진적 프로젝트 설계 Skill입니다. Just-in-Time Design, 수직 슬라이스, 코드와 문서의 보정을 결합하여 지속적으로 변화하는 프로젝트를 명확하고 실행 가능한 상태로 유지하고 과도한 선행 설계를 방지합니다.
+AI 코딩 에이전트를 위한 점진적 프로젝트 설계 Skill입니다. Just-in-Time Design, 수직 슬라이스, 코드↔문서 보정을 결합하여 과도한 선행 설계를 피하면서 문서가 구현과 함께 발전하도록 합니다.
 
-## 용도
+## 핵심 원칙
 
-대규모 선행 문서는 구현이 시작된 뒤 빠르게 부정확해지고 에이전트에 불필요한 컨텍스트를 제공합니다. 이 Skill은 현재 결정과 수직 슬라이스에 필요한 정보만 준비하고 코드, 테스트, 설정, 실행 결과를 근거로 문서를 보정합니다.
+> 문서는 의사결정의 시작점이 아니라 결과물입니다.
 
-- 새 프로젝트에 가볍고 발전 가능한 아키텍처 문서 체계 구축
-- 기존 ADR, RFC 및 문서 규칙을 유지하면서 기존 프로젝트 마이그레이션
-- 요구사항을 관찰하고 검증할 수 있는 엔드투엔드 슬라이스로 분할
-- 가장 작고 안전한 다음 작업을 한 번에 하나씩 진행
-- 구현과 설계 문서 사이의 불일치 탐지
-- 완료된 슬라이스 기록을 보관하여 활성 컨텍스트 축소
+- 현재 결정이나 슬라이스에 필요한 내용만 설계
+- 실행하고 검증할 수 있는 최소 엔드투엔드 슬라이스를 단위로 사용
+- 현재 산출물이 완성되면 멈추고 이후 범위를 미리 설계하지 않음
+- 코드, 테스트, 설정 및 실행 결과를 기반으로 문서 보정
+- 모듈 문서에 코드 위치, 의존성 및 역링크 유지
 
-## 핵심 기능
+## 상태 모델
 
-### 짧은 액션 워크플로
-
-| 액션 | 목적 |
+| 차원 | 상태 |
 |---|---|
-| `status` / `状态` | 프로젝트, 문서, 활성 슬라이스, 불일치 및 증거를 읽기 전용으로 검사 |
-| `init` / `初始化` | 최소 점진적 문서 구조 생성 또는 마이그레이션 |
-| `requirement` / `需求` | 관찰 가능한 결과를 명확히 하고 요구사항 분류 |
-| `change` / `变更` | 슬라이스, 인터페이스, 데이터 및 의존성 영향 분석 |
-| `plan` / `规划` | 다음 수직 슬라이스 계획 |
-| `prepare [Sx]` / `准备 [Sx]` | 선택한 슬라이스를 구현 준비 상태로 전환 |
-| `next` / `下一步` | 현재 증거에서 가장 작은 구현 작업 결정 |
-| `go` / `推进` | 안전하고 차단되지 않은 최소 작업 하나를 구현하고 검증 |
-| `calibrate [Sx]` / `校准 [Sx]` | 구현 증거에 따라 문서 갱신 |
-| `archive [Sx]` / `归档 [Sx]` | 완료 조건을 확인하고 슬라이스 기록 보관 |
+| 문서 성숙도 | `D0` 등록 → `D1` 초안 → `D2` 구현 준비 → `D3` 구현 중 → `D4` 보정 완료 |
+| 설계 깊이 | `L0` 경계 → `L1` 현재 슬라이스에 필요 → `L2` 필요한 상세 설계 완료 |
 
-### 3차원 상태 모델
+일반적으로 L1에서 구현을 시작하고 현재 작업에 예외 처리, 성능 등의 제약이 실제로 필요할 때만 L2로 진행합니다.
 
-- 문서 성숙도: `D0`(등록)부터 `D4`(구현과 보정 완료)
-- 설계 깊이: `L0`(경계)부터 `L2`(관련 비기능 제약)
-- 슬라이스 실행 상태: `planned`, `ready`, `in-progress`, `blocked`, `calibrating`, `done`
+## 문서 체계
 
-문서는 코드, 테스트, 설정, 마이그레이션 및 실행 진입점을 확인한 뒤에만 `D4`가 됩니다. 완료된 슬라이스는 콜드 아카이브로 이동하며 회귀, 호환성, 마이그레이션 또는 과거 결정이 관련될 때만 읽습니다.
+Skill은 `.ppd/`를 점진적 문서의 단일 진입점으로 사용합니다.
 
-## 장점
+```text
+.ppd/
+├── README.md
+├── 01-overview/
+├── 02-architecture/
+├── 03-plan/
+├── 04-progress/<slice>/
+└── 05-modules/
+```
 
-- 현재 슬라이스에 필요한 L1 정보만 준비하여 과도한 설계 방지
-- 완료된 기록을 콜드 아카이브로 이동하여 컨텍스트 비용 절감
-- 구현 및 검증 증거를 통해 문서 불일치 관리
-- 범위를 바꾸기 전에 요구사항 변경을 분류하여 진행 중인 작업 보호
-- 기존 README, ADR, RFC, 로드맵 및 모듈 문서 규칙에 적응
-- 읽기 전용 분석, 문서 변경 및 코드 구현 권한 분리
+기존 프로젝트에서는 현재 코드에서 모듈, 인터페이스, 데이터 모델 및 의존성을 추출하고 한 번에 하나의 슬라이스를 역방향으로 보정합니다.
+
+## 5단계 리듬
+
+| 단계 | 시점 | 산출물 |
+|---|---|---|
+| 골격 | 프로젝트 초기화 | `.ppd/README.md`와 최소 디렉터리 |
+| 요구사항 | 경계 확인 후 | 목적, 범위, 결정 및 비목표 |
+| 슬라이스 시작 | 구현 준비 시 | 필요한 기술 선택, 모듈 L1, 로드맵 |
+| 구현 중 | 의미 있는 변경 | 짧은 로그, 결정 이유, 남은 문제 |
+| 보정 | 슬라이스 완료 | D3→D4, 코드 위치, 차이 및 역링크 |
 
 ## 설치
 
-저장소 루트가 완전한 [Agent Skills](https://agentskills.io/) 디렉터리입니다. `SKILL.md`가 공통 진입점이며 `references/`는 필요할 때만 로드됩니다.
+저장소 루트가 완전한 [Agent Skills](https://agentskills.io/) 디렉터리입니다.
 
 | Agent | Windows | macOS / Linux |
 |---|---|---|
@@ -66,25 +66,22 @@ git clone https://github.com/xiaoda001/progressive-project-design.git \
   ~/.claude/skills/progressive-project-design
 ```
 
-설치 후 에이전트를 다시 시작하거나 Skill 검색을 새로 고치십시오. 설치된 Skill 업데이트:
+업데이트:
 
 ```bash
-git -C <skill-directory>/progressive-project-design pull --ff-only
+git -C <agent-skill-directory>/progressive-project-design pull --ff-only
 ```
 
 ## 사용 예시
 
 ```text
-$progressive-project-design status
-$progressive-project-design init
-$progressive-project-design requirement 팀 초대 기능 추가
-$progressive-project-design prepare S1
-$progressive-project-design go
-$progressive-project-design calibrate S1
-$progressive-project-design archive S1
+$progressive-project-design 이 프로젝트의 점진적 설계 상태와 가장 작은 다음 작업을 확인하세요
+$progressive-project-design 새 프로젝트용 최소 .ppd 골격을 만드세요
+$progressive-project-design 현재 로드맵에서 다음 수직 슬라이스를 계획하세요
+$progressive-project-design 현재 슬라이스와 관련된 모듈 문서를 보정하세요
 ```
 
-기존 프로젝트에서는 먼저 `status`를 실행하십시오. Claude Code에서는 `/progressive-project-design status`로 호출할 수 있습니다.
+Claude Code에서는 `/progressive-project-design 현재 프로젝트 상태를 확인하세요`처럼 호출합니다.
 
 ## 저장소 구조
 
@@ -92,9 +89,12 @@ $progressive-project-design archive S1
 progressive-project-design/
 ├── SKILL.md
 ├── agents/openai.yaml
-└── references/
-    ├── migration.md
-    └── templates.md
+├── references/migration.md
+├── references/templates.md
+├── README.md
+├── README.en.md
+├── README.ja.md
+└── README.ko.md
 ```
 
 ## 라이선스

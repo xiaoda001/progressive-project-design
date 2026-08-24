@@ -1,4 +1,4 @@
 interface:
   display_name: "渐进式项目设计"
-  short_description: "用短动作渐进规划、开发、校准并归档项目"
-  default_prompt: "Use $progressive-project-design 状态 to inspect this project and report the smallest safe next step."
+  short_description: "按需维护垂直切片、模块设计、代码文档校准关系与实现证据"
+  default_prompt: "Use $progressive-project-design to inspect this project's progressive design documents and recommend the smallest justified next step."
