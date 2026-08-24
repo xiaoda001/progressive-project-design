@@ -1,5 +1,7 @@
 # Progressive Project Design
 
+[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+
 一个面向 AI 编程代理的渐进式项目设计 Skill。它用 Just-in-Time Design（按需设计）、垂直切片和代码/文档校准，帮助项目在持续开发中保持清晰、可执行且不过度设计。
 
 ## 用途
@@ -66,14 +68,39 @@ Skill 提供一组明确的中英文动作：
 
 ## 安装
 
-将仓库克隆到 Codex 的 skills 目录：
+本仓库根目录就是一个完整的 [Agent Skills](https://agentskills.io/) 技能目录：`SKILL.md` 是统一入口，`references/` 按需加载，`agents/openai.yaml` 仅为 Codex 提供额外的界面元数据。其他 Agent 会忽略自己不认识的附加文件，因此无需维护多份 Skill。
+
+将仓库克隆到所用 Agent 的全局 Skill 目录：
+
+| Agent | Windows 目录 | macOS / Linux 目录 |
+|---|---|---|
+| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
+| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
+| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
+| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
+| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
+
+PowerShell 示例（以 Codex 为例）：
 
 ```powershell
 git clone https://github.com/xiaoda001/progressive-project-design.git `
   "$env:USERPROFILE\.codex\skills\progressive-project-design"
 ```
 
-重新加载 Codex 后即可调用。其他支持 `SKILL.md` 的 AI 编程代理也可以把本仓库放入其 skill 搜索目录。
+macOS / Linux 示例（以 Qoder 为例）：
+
+```bash
+git clone https://github.com/xiaoda001/progressive-project-design.git \
+  ~/.qoder/skills/progressive-project-design
+```
+
+安装后重新启动 Agent，或使用该 Agent 提供的 Skill 刷新功能。Qoder CLI 可执行 `/skills reload`；TRAE 可在设置中刷新 Skill 发现。更新已安装的 Skill：
+
+```bash
+git -C <skill-directory>/progressive-project-design pull --ff-only
+```
+
+也可以把整个仓库复制到其他支持 `SKILL.md` / Agent Skills 规范的工具所配置的 Skill 搜索目录。目录名应保持为 `progressive-project-design`。
 
 ## 使用示例
 
@@ -88,6 +115,8 @@ $progressive-project-design 归档 S1
 ```
 
 建议首次在已有项目中使用时先运行 `状态`。如果尚未建立项目文档，再显式执行 `初始化`。
+
+在 Claude Code 中可使用 `/progressive-project-design 状态` 等斜杠命令调用；Claude Code 也会根据 Skill 的 `description` 在相关任务中自动加载它。
 
 ## 仓库结构
 
