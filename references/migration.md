@@ -1,42 +1,49 @@
-# Adopt the method in an existing project
+# 已有项目适配与逆向校准
 
-Use this procedure only when the user asks to adopt, initialize, reorganize, or migrate documentation in a project that already contains documentation.
+仅当用户要把本方法用于已经存在代码或文档的项目时读取本文件。
 
-## Preserve first
+## 保留优先
 
-1. Read repository instructions and identify the established documentation entry point.
-2. Inventory existing overview, architecture, ADR/RFC, roadmap, module, and progress documents.
-3. Map existing material to this method without moving or renaming files by default.
-4. Identify contradictions, duplicate sources of truth, stale claims, and missing ownership.
-5. Propose the smallest migration before editing.
+1. 读取仓库指令，识别现有 README、ADR、RFC、路线图、模块文档和进度记录。
+2. 将现有资料映射到渐进式设计角色，不默认移动、重命名或复制文件。
+3. 找出重复事实源、相互矛盾的结论、过时描述和缺失的代码映射。
+4. 先提出最小迁移方案，再进行获得授权的文档变更。
+5. 不为满足推荐目录外观而创建第二套路标、模块索引或决策记录。
 
-## Mapping guidance
+## 状态语义
 
-| Existing artifact | Progressive-design role |
+代码已实现但文档缺失的模块标记为 **D4（逆向）**：先以代码、测试、配置和运行入口为依据生成文档，完成比对后再转为正式 D4。
+
+不要仅凭文件名、函数名或实现看似存在就标记正式 D4；需要核对接口、数据模型、依赖和可观察行为。
+
+## 切片定义
+
+已有项目的切片是“文档化 + 校准”闭环，而不是重新执行“设计 + 实现”：
+
+1. 选择一条端到端数据流，例如登录或“文档上传 → 检索”。
+2. 逆向提取相关模块的接口、模型、依赖和代码位置。
+3. 只为该数据流涉及的模块编写 L1 文档，初始标记 D3。
+4. 对照代码和验证证据补齐登记，完成后转为 D4。
+
+首个切片选择覆盖核心模块但文档量最少的最短路径。
+
+## 现有资料映射
+
+| 现有资料 | 在本方法中的角色 |
 |---|---|
-| README/product brief | Project overview |
-| ADR/RFC | Technology or architecture decision; retain its native format |
-| Milestone/epic | Candidate vertical slice; verify that it is user-observable |
-| Component document | Module document; add D/L metadata only if compatible |
-| Changelog/PR history | Evidence source, not automatically a slice log |
-| Test plan/runbook | Acceptance or calibration evidence |
+| README / 产品说明 | 项目概览 |
+| ADR / RFC | 技术或架构决策；保留原格式 |
+| Milestone / Epic | 候选垂直切片；需验证用户可观察结果 |
+| 组件文档 | 模块文档 |
+| Changelog / PR 历史 | 校准证据，不自动视为开发日志 |
+| 测试计划 / Runbook | 验收与运行证据 |
 
-## Editing rules
+## 迁移结果
 
-- Do not relocate files merely to match the recommended numbered directory layout.
-- Do not create a second roadmap or module index when an equivalent source of truth exists.
-- Add links or a thin index instead of duplicating content.
-- Do not label legacy material D4 until it has been checked against current implementation and evidence.
-- When existing terminology conflicts with D/L/slice terminology, prefer the repository's terminology and record the mapping once.
-- Present proposed renames, moves, or deletions to the user before performing them.
+报告以下内容：
 
-## Migration result
-
-Report:
-
-- retained sources of truth;
-- new files or metadata added;
-- unresolved contradictions;
-- active slice and acceptance evidence, if known;
-- the next smallest documentation action.
-
+- 保留的现有事实来源；
+- 新增或补充的文档与状态；
+- 未解决的矛盾和待确认推断；
+- 当前切片及其验收证据；
+- 下一项最小文档动作。

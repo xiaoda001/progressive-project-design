@@ -1,106 +1,126 @@
 # Progressive Project Design
 
-一个面向 AI 编程代理的渐进式项目设计 Skill。它用 Just-in-Time Design（按需设计）、垂直切片和代码/文档校准，帮助项目在持续开发中保持清晰、可执行且不过度设计。
+[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
-## 用途
+一个面向 AI 编程代理的渐进式项目设计 Skill。它通过 Just-in-Time Design（按需设计）、垂直切片以及代码↔文档校准，让项目文档随着实现演进，同时避免 Big Design Up Front。
 
-传统的大而全文档很容易在实现开始后失真，也会给 AI 带来大量无关上下文。Progressive Project Design 只为当前决策和当前垂直切片准备必要信息，并在实现后用代码、测试、配置和运行结果校准文档。
+## 核心原则
 
-它适合以下场景：
+> 文档是决策的产物，不是决策的起点。
+
+- **按需设计**：只细化当前决策或当前切片需要的内容。
+- **切片驱动**：以端到端可运行、可验证的最小闭环为设计单位。
+- **及时停笔**：完成当前阶段产出后停止，不提前设计后续范围。
+- **实现校准**：切片完成后，用代码、测试、配置和运行行为更新文档。
+- **双向关系**：在模块文档中维护接口代码位置、依赖和反向链接。
+
+## 状态模型
+
+| 维度 | 状态 |
+|---|---|
+| 文档成熟度 | `D0` 未设计 → `D1` 草稿 → `D2` 可开工 → `D3` 实现中 → `D4` 已校准 |
+| 设计深度 | `L0` 边界 → `L1` 当前切片所需 → `L2` 完整细化 |
+
+通常以 L1 开工；只有当前实现确实需要边界情况、异常处理、性能等约束时才进入 L2。
+
+## 项目文档体系
+
+Skill 使用 `.ppd/` 作为渐进式文档入口：
+
+```text
+.ppd/
+├── README.md
+├── 01-overview/
+├── 02-architecture/
+├── 03-plan/
+├── 04-progress/
+│   └── <slice>/
+└── 05-modules/
+```
+
+首次使用时检查现有结构，只建立必要骨架。已有代码的项目采用逆向校准：从当前实现提取模块、接口、数据模型和依赖，再逐个切片补齐文档。
+
+## 五阶段节奏
+
+| 阶段 | 触发点 | 产出 |
+|---|---|---|
+| 骨架 | 项目初始化 | `.ppd/README.md` 和最小目录 |
+| 需求 | 边界确认后 | 项目定位、范围、关键决策和非目标 |
+| 切片启动 | 当前切片准备实现 | 技术选择、相关模块 L1、路线图登记 |
+| 实现中 | 发生有意义的变更 | 简短开发日志、决策原因和遗留事项 |
+| 校准 | 切片实现完成 | D3→D4、代码位置、偏差和反向链接 |
+
+## 适用场景
 
 - 为新项目建立轻量、可演进的架构文档；
-- 将已有项目迁移到渐进式设计方法，同时保留现有 ADR、RFC 和文档习惯；
-- 把需求拆成可观察、可验收的端到端垂直切片；
-- 判断当前最小可执行任务，并一次推进一个安全步骤；
-- 检查实现与设计文档之间的偏差；
-- 在切片完成后归档历史材料，减少日常上下文噪声。
-
-## 核心功能
-
-### 短动作工作流
-
-Skill 提供一组明确的中英文动作：
-
-| 动作 | 作用 |
-|---|---|
-| `状态` / `status` | 只读检查项目、文档、当前切片、漂移和证据 |
-| `初始化` / `init` | 建立或迁移最小的渐进式文档骨架 |
-| `需求` / `requirement` | 澄清用户可观察结果并分类需求 |
-| `变更` / `change` | 分析变更对切片、接口、数据和依赖的影响 |
-| `规划` / `plan` | 规划下一个垂直切片 |
-| `准备 [Sx]` / `prepare [Sx]` | 将指定切片准备到可实现状态 |
-| `下一步` / `next` | 从当前证据中确定最小实现任务 |
-| `推进` / `go` | 实现并验证一个最小、安全、无阻塞任务 |
-| `校准 [Sx]` / `calibrate [Sx]` | 对照实现证据更新文档 |
-| `归档 [Sx]` / `archive [Sx]` | 验证完成条件并归档历史切片材料 |
-
-### 三维状态模型
-
-文档状态被拆成三个独立维度，避免用一个模糊的“完成度”混在一起：
-
-- 文档成熟度：`D0`（登记）到 `D4`（已与实现校准）；
-- 设计深度：`L0`（边界）到 `L2`（关键非功能约束）；
-- 切片执行状态：`planned`、`ready`、`in-progress`、`blocked`、`calibrating`、`done`。
-
-### 需求和变更分类
-
-新请求会被归类为澄清、小扩展、独立能力、横切变更或缺陷。Skill 不会把新需求静默塞进正在实现的切片，而是先说明影响和推荐路径。
-
-### 证据驱动校准
-
-只有在检查代码、测试、配置、迁移和可运行入口后，文档才能标记为 `D4`。实现存在但缺少验证时，会被明确标记为“可能完成”，而不是直接宣告完成。
-
-### 冷上下文归档
-
-完成的切片可以进入冷归档。日常操作只读取活跃事实，只有在回归、兼容、迁移或历史决策确实相关时，才按索引逐层加载归档内容。
-
-## 优势
-
-- **减少过度设计**：默认只准备当前切片需要的 L1 信息，L2 仅在风险真实存在时加入。
-- **降低上下文成本**：活跃文档保持紧凑，历史材料进入冷归档，AI 不必反复加载全部项目史。
-- **控制文档漂移**：以实现和验证证据校准设计，避免文档仅凭文件名或主观判断变成“已完成”。
-- **保护进行中的工作**：需求变更先分类、再决定是否调整切片，避免范围在开发中持续膨胀。
-- **兼容存量项目**：优先适配已有 README、ADR、RFC、路线图和模块文档，不强制重排目录。
-- **动作边界清晰**：只读分析、文档修改和代码实现拥有不同授权边界，降低误改风险。
-- **聚焦可交付结果**：垂直切片必须对应用户可观察结果和明确验收证据。
+- 将已有项目迁移到渐进式设计，同时保留现有 README、ADR 和 RFC；
+- 规划端到端垂直切片；
+- 根据路线图、模块 L1 文档和代码确定下一项任务；
+- 排查实现与文档之间的偏差；
+- 在切片完成后生成回顾并校准模块文档。
 
 ## 安装
 
-将仓库克隆到 Codex 的 skills 目录：
+仓库根目录就是完整的 [Agent Skills](https://agentskills.io/) 技能目录。将仓库克隆到对应 Agent 的全局 Skill 目录：
+
+| Agent | Windows | macOS / Linux |
+|---|---|---|
+| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
+| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
+| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
+| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
+| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
+
+PowerShell 示例：
 
 ```powershell
 git clone https://github.com/xiaoda001/progressive-project-design.git `
   "$env:USERPROFILE\.codex\skills\progressive-project-design"
 ```
 
-重新加载 Codex 后即可调用。其他支持 `SKILL.md` 的 AI 编程代理也可以把本仓库放入其 skill 搜索目录。
+macOS / Linux 示例：
+
+```bash
+git clone https://github.com/xiaoda001/progressive-project-design.git \
+  ~/.claude/skills/progressive-project-design
+```
+
+安装后重新启动 Agent，或使用其 Skill 刷新功能。更新已安装版本：
+
+```bash
+git -C <agent-skill-directory>/progressive-project-design pull --ff-only
+```
 
 ## 使用示例
 
 ```text
-$progressive-project-design 状态
-$progressive-project-design 初始化
-$progressive-project-design 需求 增加团队成员邀请功能
-$progressive-project-design 准备 S1
-$progressive-project-design 推进
-$progressive-project-design 校准 S1
-$progressive-project-design 归档 S1
+$progressive-project-design 检查这个项目的渐进式设计状态，并告诉我最小的下一步
+$progressive-project-design 为这个新项目建立最小的 .ppd 文档骨架
+$progressive-project-design 根据当前路线图规划下一个垂直切片
+$progressive-project-design 校准当前切片涉及的模块文档
 ```
 
-建议首次在已有项目中使用时先运行 `状态`。如果尚未建立项目文档，再显式执行 `初始化`。
+Claude Code 使用斜杠形式，例如：
+
+```text
+/progressive-project-design 检查当前项目状态
+```
 
 ## 仓库结构
 
 ```text
 progressive-project-design/
-├── SKILL.md                  # Skill 的行为、状态模型和操作协议
-├── agents/
-│   └── openai.yaml          # Codex 展示名称与默认提示词
-└── references/
-    ├── migration.md         # 存量文档迁移规则
-    └── templates.md         # 渐进式项目文档模板
+├── SKILL.md
+├── agents/openai.yaml
+├── references/
+│   ├── migration.md
+│   └── templates.md
+├── README.md
+├── README.en.md
+├── README.ja.md
+└── README.ko.md
 ```
 
 ## 许可证
 
-本项目采用 [MIT License](LICENSE)。
+[MIT License](LICENSE)

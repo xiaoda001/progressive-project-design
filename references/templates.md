@@ -1,209 +1,129 @@
-# Minimal document templates
+# .ppd 文档模板
 
-Read only the section needed for the artifact being created or updated. Adapt headings to established repository conventions while preserving the required state and evidence fields.
+只读取当前要创建或更新的模板章节。已有项目存在兼容模板时，优先沿用原有结构并保留下面要求的状态、边界和证据字段。
 
-## `docs/README.md`
+以下是每种文档类型的最小可用模板，agent 严格按此结构输出，不额外发挥：
+
+### 骨架 README（.ppd/README.md）
 
 ```markdown
-# 项目文档索引
+# 项目文档主索引
 
-> 原则：按需设计、垂直切片、实现后校准。
+> 本文件是 .ppd/ 目录的唯一入口。
 
-## 当前状态
+## 文档策略
 
-- 当前切片：[S1 / 无]
-- 切片状态：[planned / ready / in-progress / blocked / calibrating / done]
+| 约定     | 说明                                             |
+| -------- | ------------------------------------------------ |
+| 按需设计 | 文档仅在需要做决策时编写                         |
+| 状态标注 | D0-D4 成熟度，每篇文档头部标注                   |
+| 切片驱动 | 以端到端最小闭环为设计单位                       |
+| 双向链接 | 文档↔代码映射与反向链接由 LLM 在校准阶段自动维护 |
 
-## 导航
+## 文档导航
 
-| 分类 | 文档 | 用途 |
-|---|---|---|
-| 项目概览 | [01-overview/project-overview.md](01-overview/project-overview.md) | 产品边界和非目标 |
-| 技术决策 | [02-architecture/tech-stack.md](02-architecture/tech-stack.md) | 当前切片需要的技术选择 |
-| 切片路线图 | [03-plan/roadmap.md](03-plan/roadmap.md) | 切片、验收标准和依赖 |
-| 模块索引 | [05-modules/README.md](05-modules/README.md) | 模块 D/L 状态 |
+| 编号 | 分类     | 文档                                                                      |
+| ---- | -------- | ------------------------------------------------------------------------- |
+| 01   | 项目概览 | [project-overview.md](01-overview/project-overview.md)                    |
+| 02   | 技术选型 | —（切片启动时补充）                                                       |
+| 03   | 开发计划 | —（切片启动时补充）                                                       |
+| 04   | 开发记录 | 切片目录链接（切片登记时按 `04-progress/<切片>/` 补充，见"切片归档目录"） |
+| 05   | 模块清单 | —（切片启动时补充）                                                       |
+
+## 编写节奏
+
+| 节奏        | 触发条件       | 产出物                  |
+| ----------- | -------------- | ----------------------- |
+| 1. 骨架     | 项目初始化     | 本文档                  |
+| 2. 需求     | 需求确认后     | 项目概览                |
+| 3. 切片启动 | 切片开工前一周 | 选型 + 模块 L1          |
+| 4. 实现中   | 每次变更       | 开发日志                |
+| 5. 校准     | 切片完成       | 状态更新 + 代码链接同步 |
 ```
 
-Do not link files that do not exist; use `—` until they are created.
-
-## Project overview
+### 项目概览（.ppd/01-overview/project-overview.md）
 
 ```markdown
 # 项目概览
 
-> 成熟度：D1
-> 设计深度：L0
-> 最后校准：—
+> 状态：L0 边界（[日期]需求确认）
 
 ## 定位
 
-[一句话说明为谁解决什么问题]
+一句话说清项目做什么。
 
-## 目标用户与核心路径
+## 核心功能
 
-- 目标用户：
-- 核心路径：
-
-## 部署与数据边界
-
-- 部署形态：
-- 数据位置与敏感性：
+- 从需求确认中提取的功能要点
 
 ## 关键决策
 
-| 决策 | 结论 | 依据 | 待确认项 |
-|---|---|---|---|
+| 决策项   | 结论             |
+| -------- | ---------------- |
+| 部署形态 | 从需求对话中获取 |
+| ...      | ...              |
 
-## 明确不做
+## 明确不做（本阶段边界）
 
-- [本阶段非目标]
+- 不在当前切片范围内的事项
+
+## 相关文档
+
+- 主索引：[../README.md](../README.md)
 ```
 
-## Technology decisions
+### 模块 L1（.ppd/05-modules/<slug>.md）
 
 ```markdown
-# 技术决策
+# 模块名称
 
-| 决策 | 选择 | 成熟度 | 适用切片 | 原因 | 重新评估条件 |
-|---|---|---|---|---|---|
-| [数据库] | [选择] | D1 | S1 | [原因] | [触发条件] |
-```
+> 状态：L1 切片所需（[日期]，[切片名]）
 
-Record only decisions needed by the current or imminent slice. Include exact versions only when compatibility or reproducibility depends on them.
+## 职责边界
 
-## Slice roadmap
+- 职责清单
 
-```markdown
-# 切片路线图
+### 明确不做
 
-| ID | 名称 | 状态 | 用户可观察结果 | 验收证据 | 涉及模块 | 依赖/阻塞 | 明确不做 |
-|---|---|---|---|---|---|---|---|
-| S1 | [名称] | planned | [结果] | [命令、测试或演示步骤] | [模块] | [无/依赖] | [范围外] |
-
-## 当前切片
-
-- ID：S1
-- 下一状态条件：[进入 ready / done 所缺的证据]
-```
-
-## Module index
-
-```markdown
-# 模块索引
-
-| 模块 | 成熟度 | 深度 | 当前切片 | 最后校准 | 文档 |
-|---|---|---|---|---|---|
-| [模块] | D0 | L0 | — | — | — |
-```
-
-## Module document
-
-```markdown
-# [模块名称]
-
-> 成熟度：D2
-> 设计深度：L1
-> 所属切片：S1
-> 最后校准：—
-
-## 职责与边界
-
-- 负责：
-- 不负责：
-
-## 当前切片流程
-
-[输入 → 关键处理 → 输出]
+- 不在本模块范围内的事项
 
 ## 对外接口
 
-| 接口/方法 | 输入 | 输出 | 失败方式 |
-|---|---|---|---|
+| 端点/方法 | 说明     | 代码位置                  |
+| --------- | -------- | ------------------------- |
+| POST /xxx | 功能说明 | 路径#行号（校准阶段补齐） |
 
 ## 数据模型
 
-| 模型 | 必要字段 | 约束 |
-|---|---|---|
+- 核心模型名称与字段摘要
 
 ## 依赖关系
 
-- 依赖：
-- 被依赖：
+依赖：XXX
+被依赖：YYY
 
-## 验收证据
+## 反向链接（LLM 维护）
 
-- [测试、命令或可观察行为]
-
-## 未决问题
-
-- [仅列阻碍当前切片的事项]
+- 被 [roadmap.md](../03-plan/roadmap.md) 切片 [切片名] 引用
+- 实现校准：[开发日志 日期-标题](../04-progress/<切片>/<文件>.md)
 ```
 
-## Slice log
+### 开发日志（.ppd/04-progress/<切片>/<日期>-<描述>.md）
 
 ```markdown
-# S1 实现日志
+# [日期] [标题]
 
-## [日期] [变更标题]
+## 变更内容
 
-- 变更：
-- 原因：
-- 影响的接口/数据/范围：
-- 验证证据：
-- 遗留事项：
+- 做了什么
+
+## 决策与原因
+
+- 为什么这么做
+
+## 遗留事项
+
+- 未解决的问题
 ```
 
-Append only meaningful entries. Do not create one file per trivial change.
-
-## Calibration entry
-
-Append or update this section in the relevant module document:
-
-```markdown
-## 校准记录
-
-| 日期 | 实现证据 | 与原设计的偏差 | 文档调整 |
-|---|---|---|---|
-| [日期] | [代码、测试、运行结果] | [无/说明] | [调整摘要] |
-```
-
-After verification, set maturity to D4 and update `最后校准`.
-
-## Archive index
-
-Create `docs/99-archive/README.md` only when archiving the first slice:
-
-```markdown
-# 归档索引
-
-> 冷上下文：日常操作不读取归档正文；仅在当前证据不足且历史相关时按索引逐层检索。
-
-| 切片 | 完成日期 | 用户可观察结果 | 影响模块 | 摘要 |
-|---|---|---|---|---|
-| S1 | YYYY-MM-DD | [结果] | [模块] | [summary](slices/S1/summary.md) |
-```
-
-Keep this index compact. Do not duplicate implementation logs or detailed evidence here.
-
-## Archived slice summary
-
-Create `docs/99-archive/slices/<slice-id>/summary.md` before moving detailed historical artifacts:
-
-```markdown
-# S1 归档摘要
-
-- 状态：done / archived
-- 完成日期：YYYY-MM-DD
-- 用户可观察结果：
-- 最终验收证据：
-- 影响模块：
-- 保留在活跃文档中的当前事实：
-- 关键历史决策：
-- 已知限制或后续事项：
-
-## 详细历史资料
-
-- [实现日志](implementation-log.md)
-```
-
-Link only files that exist. Keep current architectural truth in active documents; use this summary for discovery and historical explanation.
+**自动生成**：实现中每次变更，agent 基于 `git diff` 自动生成日志（3-5 行）。变更涉及接口/模型/依赖时，同时更新相关模块文档的"代码位置"链接并追加反向链接；设计被推翻的变更在"决策与原因"中注明，等校准阶段回写。
