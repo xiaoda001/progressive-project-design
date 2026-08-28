@@ -5,306 +5,310 @@ description: Guides project architecture documentation through progressive, Just
 
 # Progressive Project Design
 
-## 核心原则
+## Response Language
 
-渐进式设计的本质：**文档是决策的产物，不是决策的起点。** 只在需要做决策时写文档，不做决策时不写。
+Always respond in the language used by the user, unless the user explicitly requests another language.
 
-| 原则         | 说明                                             |
-| ------------ | ------------------------------------------------ |
-| Just-in-Time | 模块细节仅在实现前细化，不提前铺开               |
-| 切片驱动     | 以端到端可运行的最小闭环为设计单位，非按模块展开 |
-| 停笔点       | 每个阶段的文档写完即停，等下一个触发条件再继续   |
-| 三档深度     | L0 边界 → L1 切片所需 → L2 完整细化              |
+## Core Principles
 
-## 首次激活检查清单
+The essence of progressive design is: **Documentation is an output of decisions, not their starting point.** Write documentation only when a decision needs to be made; do not write it when no decision is needed.
 
-**首次**触发此 skill 时，立即执行以下检查，确保项目已具备渐进式设计的基础结构。
+| Principle | Description |
+| --- | --- |
+| Just-in-Time | Refine module details only before implementation; do not lay them out in advance |
+| Slice-driven | Use the smallest runnable end-to-end loop as the design unit, rather than expanding module by module |
+| Stop point | Stop after completing the documentation for each stage and wait for the next trigger |
+| Three depth levels | L0 boundary → L1 slice needs → L2 full refinement |
 
-**主动触发条件**（以下任一满足时自动提议此方法，无需等待用户明确要求）：
+## First Activation Checklist
 
-- 项目根目录下不存在 `.ppd/` 目录
-- 项目已有 `.ppd/` 但内容为一次性铺开、没有状态标注、没有切片计划
-- 用户刚执行完 `git init` 或 `uv init` / `pnpm create` 等初始化命令
+When this skill is triggered for the **first time**, immediately perform the following checks to ensure the project has the foundational structure for progressive design.
 
-检查清单：
+**Proactive trigger conditions** (automatically propose this method when any of the following is true, without waiting for an explicit user request):
 
-- [ ] 检查项目根目录下是否存在 `.ppd/` 目录
-  - 存在则复用
-  - 不存在 → 创建 `.ppd/`，并在内部创建子目录：`01-overview/` `02-architecture/` `03-plan/` `04-progress/` `05-modules/`（`04-progress/` 内按切片建子目录 `s1/ s2/ ...`，见"切片归档目录"）
-- [ ] 检查 `.ppd/README.md` 是否存在；不存在则创建骨架文档（含文档策略表 + 编写节奏表 + 空导航表）
-- [ ] 检查 `.gitignore` 中是否已包含 `.ppd/`；不存在则建议添加
+- The project root does not contain a `.ppd/` directory
+- The project already has `.ppd/`, but its content was laid out all at once and has no status labels or slice plan
+- The user has just run an initialization command such as `git init`, `uv init`, or `pnpm create`
 
-执行完以上检查后，**只产出骨架文档**，不多写。若为**已有项目**（代码已存在），追加执行一次逆向分析，自动生成 wiki 文档初稿：
+Checklist:
 
-- 扫描代码产出模块清单（D 状态表，L0 登记）
-- 为已实现模块生成骨架文档（职责边界 + 接口表 + 代码位置，状态标 D4 逆向）
-- 生成项目概览草稿（基于代码推断，标注待确认项）
+- [ ] Check whether the project root contains a `.ppd/` directory
+  - Reuse it if it exists
+  - If it does not exist → create `.ppd/` with these subdirectories: `01-overview/` `02-architecture/` `03-plan/` `04-progress/` `05-modules/` (inside `04-progress/`, create subdirectories by slice: `s1/ s2/ ...`; see "Slice Archive Directory")
+- [ ] Check whether `.ppd/README.md` exists; if not, create a skeleton document containing the documentation strategy table, writing cadence table, and an empty navigation table
+- [ ] Check whether `.gitignore` already contains `.ppd/`; if not, suggest adding it
 
-然后进入需求确认对话（见 Step 1）。
+After completing these checks, **produce only the skeleton documentation** and do not write more. If this is an **existing project** (code already exists), additionally perform one reverse-analysis pass and automatically generate initial wiki drafts:
 
-后续项目打开时不再重复此流程，直接跳到对应步骤。
+- Scan the code to produce a module inventory (D-status table, registered at L0)
+- Generate skeleton documents for implemented modules (responsibility boundary + interface table + code locations, marked D4 reverse-engineered)
+- Generate a draft project overview based on inferences from the code, with items requiring confirmation clearly marked
 
-## 状态系统
+Then enter the requirements-confirmation conversation (see Step 1).
 
-### 文档成熟度（D0–D4）
+Do not repeat this process when the project is opened later; go directly to the appropriate step.
 
-| 状态 | 含义                       | 可信度 |
-| ---- | -------------------------- | ------ |
-| D0   | 未设计，仅登记名称或占位   | 无     |
-| D1   | 草稿，未经实现验证         | 低     |
-| D2   | 定稿，评审通过可开工       | 中     |
-| D3   | 实现中，允许被实际代码推翻 | 中     |
-| D4   | 已校准，实现完成后回写对齐 | 高     |
+## Status System
 
-### 设计深度（L0–L2）
+### Documentation Maturity (D0–D4)
 
-| 深度        | 触发条件                 | 内容                                    |
-| ----------- | ------------------------ | --------------------------------------- |
-| L0 边界     | 项目启动或模块登记       | 一句话职责、输入输出边界、依赖关系      |
-| L1 切片所需 | 该模块首次被垂直切片涉及 | L0 + 本次切片用到的接口、数据模型、流程 |
-| L2 完整细化 | 该模块完整实现前         | L1 + 边界情况、异常处理、性能考量       |
+| Status | Meaning | Confidence |
+| --- | --- | --- |
+| D0 | Not designed; only a registered name or placeholder | None |
+| D1 | Draft, not validated by implementation | Low |
+| D2 | Finalized and approved for implementation | Medium |
+| D3 | In implementation; may be overturned by actual code | Medium |
+| D4 | Calibrated and aligned after implementation | High |
 
-## 文档关系模型（LLM Wiki）
+### Design Depth (L0–L2)
 
-本方法论的文档体系以 wiki 方式组织，关系由 LLM 自动维护：
+| Depth | Trigger | Content |
+| --- | --- | --- |
+| L0 boundary | Project kickoff or module registration | One-sentence responsibility, input/output boundaries, dependencies |
+| L1 slice needs | The module is first involved in a vertical slice | L0 + interfaces, data models, and flows used by the current slice |
+| L2 full refinement | Before the module is fully implemented | L1 + edge cases, error handling, and performance considerations |
 
-| 关系     | 载体                                |
-| -------- | ----------------------------------- |
-| 导航索引 | .ppd/README.md 导航表（唯一入口）   |
-| 双向链接 | 模块文档"反向链接"区块 + 跨文档引用 |
-| 代码映射 | 接口表"代码位置"列（文件#行号）     |
-| 状态追踪 | D0-D4 状态贯穿所有文档              |
-| 依赖图谱 | 模块"依赖/被依赖"声明汇总           |
+## Documentation Relationship Model (LLM Wiki)
 
-管理价值：文档从"一次性写死的静态文件"变为可跳转、可追踪、与代码同频的知识网络；LLM 负责维护关系，人只负责决策。
+This methodology organizes documentation as a wiki, with relationships maintained automatically by the LLM:
 
-## 编写节奏
+| Relationship | Carrier |
+| --- | --- |
+| Navigation index | Navigation table in `.ppd/README.md` (the single entry point) |
+| Bidirectional links | The module document's "Backlinks" section + cross-document references |
+| Code mapping | The "Code location" column in interface tables (`file#line`) |
+| Status tracking | D0–D4 status throughout all documents |
+| Dependency graph | Aggregated module declarations of "depends on / depended on by" |
 
-按五个触发点组织，每步产出物即停，不要跨越：
+Management value: documentation changes from one-off, static files into a navigable, traceable knowledge network that stays synchronized with the code. The LLM maintains the relationships; people make the decisions.
 
-| 节奏        | 触发条件           | 产出物                                                     | 数量参考   |
-| ----------- | ------------------ | ---------------------------------------------------------- | ---------- |
-| 1. 骨架     | 项目初始化         | 主索引 README：空导航表 + D/L 状态约定 + 编写节奏表        | 1 篇       |
-| 2. 需求     | 需求确认后         | 项目概览：定位、边界、关键决策、明确不做清单               | 1 篇       |
-| 3. 切片启动 | 每个切片开工前一周 | 技术选型定稿 + 该切片涉及的模块 L1 设计 + 路线图切片登记   | 2-4 篇     |
-| 4. 实现中   | 每次变更           | 开发日志（3-5 行变更摘要 + 决策原因 + 遗留事项）           | 随变随写   |
-| 5. 校准     | 切片完成           | 回写模块文档状态 D3→D4，补充被实现推翻的设计，同步代码链接 | 更新不新增 |
+## Writing Cadence
 
-## 切片归档目录
+Organize work around five triggers. Stop after producing the artifact for each step; do not cross into the next step.
 
-`.ppd/04-progress/` 按切片组织，每个切片一个子目录（`s1/ s2/ ...`），切片在 roadmap 登记（节奏 3）时即创建该目录：
+| Cadence | Trigger | Artifact | Quantity guideline |
+| --- | --- | --- | --- |
+| 1. Skeleton | Project initialization | Main README index: empty navigation table + D/L status conventions + writing cadence table | 1 document |
+| 2. Requirements | After requirements are confirmed | Project overview: positioning, boundaries, key decisions, and an explicit non-goals list | 1 document |
+| 3. Slice kickoff | One week before each slice starts | Finalized technology choices + L1 designs for modules involved in the slice + slice registration in the roadmap | 2–4 documents |
+| 4. During implementation | Each change | Development log (3–5 lines: change summary + decision rationale + outstanding items) | As changes occur |
+| 5. Calibration | Slice completion | Update module documents from D3→D4, record designs overturned by implementation, and synchronize code links | Update only; do not add documents |
+
+## Slice Archive Directory
+
+Organize `.ppd/04-progress/` by slice, with one subdirectory per slice (`s1/ s2/ ...`). Create the slice directory when the slice is registered in the roadmap (cadence 3):
 
 ```text
 .ppd/04-progress/
-├── s1/                       # 该切片全部开发日志 + 切片回顾
-│   ├── 2026-08-19-xxx.md     # 开发日志（节奏 4，直接写入所属切片目录）
-│   └── S1-2026-08-19-回顾.md  # 切片回顾（校准节奏归档，与日志同目录）
-└── s2/                       # 下一个切片 ...
+├── s1/                         # All development logs + slice retrospective
+│   ├── 2026-08-19-xxx.md       # Development log (cadence 4, written directly into its slice directory)
+│   └── S1-2026-08-19-review.md # Slice retrospective (archived during calibration, alongside the logs)
+└── s2/                         # Next slice ...
 ```
 
-约定：
+Conventions:
 
-- **切片内聚**：日志与回顾同目录共存，检索/排查按切片目录定位
-- **主索引轻维护**：`.ppd/README.md` 导航表 04 分类只维护到目录级链接（每切片一个链接 + 回顾文件链接），不逐文件登记
-- **跨文档引用**：模块文档反向链接、roadmap 归档链接统一用 `../04-progress/<切片>/<文件>.md`
-- **.ppd 自身管理日志**（非业务切片变更，如目录结构调整）落在 `04-progress/` 根目录，不占切片目录
+- **Slice cohesion**: Keep logs and the retrospective in the same directory; locate and investigate work by slice directory
+- **Lightweight main-index maintenance**: In the `.ppd/README.md` navigation table, category 04 links only to directories (one link per slice + a link to the retrospective), rather than registering every file
+- **Cross-document references**: Module-document backlinks and roadmap archive links consistently use `../04-progress/<slice>/<file>.md`
+- **Logs for `.ppd` management itself** (non-business-slice changes such as directory-structure adjustments) go in the root of `04-progress/` and do not occupy a slice directory
 
-## 工作流程
+## Workflow
 
-### 阶段一：确认需求（节奏 2 触发点）
+### Phase One: Confirm Requirements (Cadence 2 Trigger)
 
-在写任何文档前，通过对话锁定边界决策。从以下 4 个维度中选取**与项目类型相关**的提问，不必全部问完：
+Before writing any documentation, lock down boundary decisions through conversation. Select questions relevant to the project type from the following four dimensions; it is not necessary to ask every question.
 
-**通用维度（必问）：**
+**General dimensions (required):**
 
-- **目标用户**：谁用这个系统？终端用户 / 内部团队 / 开发者
-- **部署形态**：单机本地 / 公开 Web 服务 / 团队自托管
+- **Target users**: Who will use the system? End users / internal teams / developers
+- **Deployment model**: Local standalone / public web service / team self-hosted
 
-**按项目类型选问：**
+**Select by project type:**
 
-- **数据密集型项目**：数据存储在哪？本地自托管 / 云端 / 混合
-- **AI 项目**：模型在哪跑？本地 / 云端 API / 两者可切换；处理什么输入？纯文本 / 多模态 / 结构化数据
-- **业务系统项目**：核心实体是什么？用户流程是怎样的？需要什么角色权限
+- **Data-intensive projects**: Where is data stored? Local self-hosted / cloud / hybrid
+- **AI projects**: Where does the model run? Local / cloud API / switchable between both; what inputs are processed? Plain text / multimodal / structured data
+- **Business systems**: What are the core entities? What is the user flow? What roles and permissions are needed?
 
-**确认后才写概览**，不确认不写。
+**Write the overview only after confirmation; do not write it before confirmation.**
 
-**业界方案建议**：需求确认后、写概览前，agent 基于业界实践提出 2-3 个可选方案（技术选型 / 架构形态 / 功能范围），说明取舍与适用场景，由用户选择后再落笔。用户想法为主导，业界建议为参照，不替用户做决定。
+**Industry-practice options**: After confirming requirements and before writing the overview, the agent proposes 2–3 options based on industry practices (technology choices / architecture shape / feature scope), explains tradeoffs and applicable scenarios, and lets the user choose before writing. The user's ideas lead; industry guidance is a reference. Do not decide for the user.
 
-### 阶段二：确定垂直切片
+### Phase Two: Define Vertical Slices
 
-切片是端到端可运行的最小闭环，横跨多个模块但只有一个数据流：
+A slice is the smallest runnable end-to-end loop. It crosses multiple modules but contains only one data flow:
 
-```
-按模块拆（BDUF）：
-  模块A 设计 → 模块B 设计 → 模块C 设计 → 实现
+```text
+Split by module (BDUF):
+  Design Module A → Design Module B → Design Module C → Implement
 
-按切片拆（渐进）：
-  切片1（最小闭环）设计+实现 → 切片2 设计+实现 → ...
-```
-
-切片划分标准：
-
-- 每个切片独立可验证（能跑通、能展示）
-- 切片间的依赖关系尽量单向
-- 第一个切片选择"最短路径"——覆盖最多核心模块但实现最轻
-
-### 阶段三：延迟细化（节奏 3 触发点）
-
-只有切片启动前一周才：
-
-1. **定稿技术选型**：从 D1 升到 D2，锁定版本
-2. **细化模块设计**：根据切片需要，写涉及的模块 L1 文档
-3. **登记切片路线图**：在 roadmap 中记录切片名称、覆盖模块、目标
-
-**不涉及的模块全程 D0，不碰不写。**
-
-### 阶段四：写日志不写设计（节奏 4）
-
-实现期间只记录变更日志（3-5 行），不新增设计文档。设计变更通过日志留痕，等校准阶段再回写。日志是问题排查的第一线索——"决策与原因"记录为何如此实现，"遗留事项"记录已知问题。
-
-**归档**：切片完成（校准节奏）时，把该切片期间的开发日志汇总为切片回顾（`.ppd/04-progress/<切片>/<切片>-<日期>-回顾.md`，与该切片日志同目录），保证日志可检索、不丢失；涉及接口/模型变化的日志同步更新模块文档的"代码位置"链接与反向链接。
-
-### 阶段五：校准（节奏 5）
-
-切片实现完成后：
-
-1. 验证设计文档与实际代码的偏差
-2. 更新模块文档状态 D3 → D4
-3. 回写被推翻的设计决策
-4. **不扩写**——D4 只对齐，不增加范围
-5. **同步代码映射**：更新切片涉及模块文档接口表的"代码位置"列与"反向链接"区块，确保文档与代码可双向跳转
-
-**LLM 自动同步**：校准阶段由 agent 自动执行——扫描 `git diff` 与代码符号（端点/模型/函数），与 L1 文档接口清单比对：
-
-- 接口已实现且文档已登记 → 补齐代码位置链接，状态转 D4
-- 接口已实现但文档未登记 → 先补登记再置 D4，防止文档滞后
-- 文档已登记但代码已移除 → 标记为被推翻的设计，回写决策
-
-## 反模式
-
-| 反模式                   | 问题                             | 正确做法                                      |
-| ------------------------ | -------------------------------- | --------------------------------------------- |
-| 一次性铺开全部模块设计   | 认知过载，设计未经实现验证       | 只写当前切片需要的模块 L1                     |
-| 同时写概览+架构+全部模块 | 身份不清（读者/时机/用途不明确） | 先确认需求 → 写概览 → 停笔                    |
-| 模块文档写到 L2 再开工   | L2 细节大概率被实现推翻          | L1 就够开工，L2 实现前一并细化                |
-| 实现完成后不管文档       | 文档迅速过时变废纸               | 校准节奏回写 D3→D4                            |
-| 切片不定义可验证标准     | 分不清切片是否做完               | 每个切片定义"能跑通什么"作为完成条件          |
-| 开发中忘记下一步做什么   | 原地打转或凭记忆猜测优先级       | 运行开发任务导航章节，基于文档+代码推导下一步 |
-
-## 开发任务导航
-
-当用户问"下一步做什么"时，按以下流程诊断并输出可执行的任务清单。
-
-### Step 1: 读取切片计划
-
-读取 `.ppd/03-plan/roadmap.md`，确定当前正在进行的切片及其覆盖模块。
-
-### Step 2: 扫描模块 L1 文档
-
-读取当前切片涉及的模块文档（`.ppd/05-modules/` 下标记为 S1a/S1b 等状态的 .md 文件），提取：
-
-- 已声明的对外接口清单
-- 已声明的数据模型
-- 依赖关系（哪些模块需先完成）
-
-### Step 3: 比对代码实现
-
-扫描项目代码，与 L1 文档中的接口清单逐条比对：
-
-- **已实现**：接口存在，跳过
-- **未实现但有依赖未就绪**：标记为阻塞，暂不推进
-- **未实现且依赖已就绪**：标记为下一步候选
-
-### Step 4: 按依赖排序输出
-
-整理为下一步任务清单，格式：
-
-```
-当前切片：[切片名]
-切片完成条件：[L1 文档中定义的切片验收标准]
-
-已完成：
-- [x] 接口A（代码已存在）
-- [x] 接口B（代码已存在）
-
-下一步：
-1. [优先级最高] 接口C — L1 文档已定义，代码不存在，无依赖阻塞
-2. [次优先] 接口D — 需要先完成接口C
-
-阻塞中：
-- 接口E — 等待模块X完成（该模块不在当前切片）
+Split by slice (progressive):
+  Design + implement Slice 1 (smallest loop) → Design + implement Slice 2 → ...
 ```
 
-### 特殊情况
+Slice criteria:
 
-- **无进行中的切片**：切换到节奏 2（需求确认）或节奏 3（切片启动前细化）
-- **切片内所有接口均已实现**：声明切片可进入校准节奏，建议用户启动下一个切片
-- **代码比 L1 文档多**（有接口已实现但未登记）：先更新文档 D4（补登记接口与代码位置）再继续，防止文档滞后
-- **接口已实现但代码位置未登记**：补齐代码链接再继续，保持双向链接有效
+- Each slice is independently verifiable (it can run and be demonstrated)
+- Keep dependencies between slices as one-directional as possible
+- Choose the "shortest path" for the first slice: cover the most core modules with the lightest implementation
 
-## 问题排查导航
+### Phase Three: Delay Refinement (Cadence 3 Trigger)
 
-当出现 bug 或异常行为时，按以下顺序回溯：
+Only during the week before a slice starts:
 
-1. 定位现象涉及的模块 → 读取 .ppd/05-modules/<模块>.md 的接口表与职责边界
-2. 检索 .ppd/04-progress/<切片>/ 开发日志（按切片目录定位，查同目录回顾）：查"决策与原因"（为何如此实现）与"遗留事项"（已知问题）
-3. 沿"代码位置"链接直达实现代码，比对文档描述与实际行为
-4. 修复后按节奏 4 写日志（记录根因），供后续排查复用
+1. **Finalize technology choices**: Promote from D1 to D2 and lock versions
+2. **Refine module design**: Write L1 documentation for involved modules according to the slice's needs
+3. **Register the slice roadmap**: Record the slice name, covered modules, and goal in the roadmap
 
-## 项目速览
+**Keep uninvolved modules at D0 throughout; do not touch or write them.**
 
-当用户问"这个项目是什么状态"或打开一个已有项目时，执行以下速览流程：
+### Phase Four: Write Logs, Not Design (Cadence 4)
 
-1. **读取 .ppd/README.md**：获取文档策略与编写节奏约定
-2. **读取 .ppd/01-overview/project-overview.md**：定位、边界、关键决策
-3. **读取 .ppd/03-plan/roadmap.md**：切片计划与当前进度
-4. **读取 .ppd/05-modules/README.md**：各模块 D 状态表
-5. **读取 .ppd/02-architecture/tech-stack.md**（如存在）：技术选型
+During implementation, record only development logs (3–5 lines) and do not add design documents. Record design changes in logs and wait until the calibration phase to write them back. Logs are the first source for troubleshooting: "Decision and rationale" records why the implementation took this form, and "Outstanding items" records known issues.
 
-汇总输出：
+**Archiving**: When the slice is complete (calibration cadence), summarize its development logs into a slice retrospective (`.ppd/04-progress/<slice>/<slice>-<date>-review.md`, alongside the logs) so logs remain searchable and are not lost. For logs involving interface or model changes, also update the "Code location" links and backlinks in the relevant module documents.
 
+### Phase Five: Calibrate (Cadence 5)
+
+After slice implementation is complete:
+
+1. Verify deviations between design documentation and actual code
+2. Update module-document status from D3 → D4
+3. Write back design decisions that were overturned
+4. **Do not expand** — D4 aligns only; it does not add scope
+5. **Synchronize code mappings**: Update the "Code location" column and "Backlinks" section in interface tables for modules involved in the slice, ensuring bidirectional navigation between documentation and code
+
+**Automatic LLM synchronization**: During calibration, the agent automatically scans `git diff` and code symbols (endpoints / models / functions) and compares them with the interface inventory in L1 documentation:
+
+- Interface implemented and already documented → complete the code-location link and change status to D4
+- Interface implemented but not documented → register it first, then set it to D4, preventing documentation lag
+- Interface documented but removed from the code → mark it as an overturned design and write back the decision
+
+## Anti-Patterns
+
+| Anti-pattern | Problem | Correct approach |
+| --- | --- | --- |
+| Designing every module all at once | Cognitive overload; design has not been validated by implementation | Write only the L1 detail needed by the current slice |
+| Writing the overview, architecture, and all modules together | Reader, timing, and purpose are unclear | Confirm requirements → write overview → stop |
+| Writing module documentation to L2 before implementation | L2 details are likely to be overturned during implementation | L1 is enough to start; refine to L2 together with implementation when needed |
+| Ignoring documentation after implementation | Documentation quickly becomes stale and useless | Use calibration cadence to update D3→D4 |
+| Failing to define verifiable criteria for a slice | It is unclear when the slice is complete | Define "what can run" as the completion condition for every slice |
+| Forgetting what to do next during development | Work stalls or priorities are guessed from memory | Run the Development Task Navigation section and derive the next step from documentation + code |
+
+## Development Task Navigation
+
+When the user asks "What should I do next?", use the following process to diagnose the state and produce an actionable task list.
+
+### Step 1: Read the Slice Plan
+
+Read `.ppd/03-plan/roadmap.md` to identify the current in-progress slice and the modules it covers.
+
+### Step 2: Scan Module L1 Documentation
+
+Read the module documents involved in the current slice (`.md` files under `.ppd/05-modules/` marked with statuses such as S1a/S1b) and extract:
+
+- Declared public interfaces
+- Declared data models
+- Dependencies (which modules must be completed first)
+
+### Step 3: Compare the Code Implementation
+
+Scan the project code and compare it item by item with the interface inventory in the L1 documentation:
+
+- **Implemented**: The interface exists; skip it
+- **Not implemented, with dependencies not ready**: Mark it blocked and do not proceed for now
+- **Not implemented, with dependencies ready**: Mark it as a next-step candidate
+
+### Step 4: Sort by Dependency and Output
+
+Organize the result as a next-step task list in this format:
+
+```text
+Current slice: [slice name]
+Slice completion condition: [slice acceptance criteria defined in the L1 documentation]
+
+Completed:
+- [x] Interface A (code exists)
+- [x] Interface B (code exists)
+
+Next steps:
+1. [Highest priority] Interface C — defined in L1 documentation, absent from code, no dependency blockers
+2. [Second priority] Interface D — requires Interface C first
+
+Blocked:
+- Interface E — waiting for Module X (that module is not in the current slice)
 ```
-项目：[名称]
-定位：[从 overview 提取的一句话]
-当前阶段：[从 roadmap 提取的切片状态]
-完成度：S1a [进行中] / S1b [未开始] ...
 
-模块可信度：
-  ├ 账号与权限    D3 实现中（参考文档可用）
-  ├ 文档管理       D1 草稿（未经验证）
-  └ 知识库引擎     D0（未设计）
+### Special Cases
 
-下一步可以做什么：
-  当前切片未完成事项（见开发任务导航）
+- **No in-progress slice**: Switch to cadence 2 (requirements confirmation) or cadence 3 (pre-slice refinement)
+- **All interfaces in the slice are implemented**: State that the slice can enter calibration cadence and suggest starting the next slice
+- **Code contains more than the L1 documentation** (an interface is implemented but not registered): First update the documentation to D4 by registering the interface and code location, then continue, preventing documentation lag
+- **Interface is implemented but its code location is not registered**: Complete the code link before continuing to preserve valid bidirectional links
+
+## Troubleshooting Navigation
+
+When a bug or unexpected behavior occurs, trace it in this order:
+
+1. Identify the module involved in the symptom → read the interface table and responsibility boundary in `.ppd/05-modules/<module>.md`
+2. Search development logs under `.ppd/04-progress/<slice>/` (locate by slice directory and check the retrospective in the same directory): inspect "Decision and rationale" for why it was implemented this way and "Outstanding items" for known issues
+3. Follow the "Code location" link directly to the implementation and compare documented behavior with actual behavior
+4. After fixing it, write a cadence-4 log recording the root cause for future troubleshooting
+
+## Project Snapshot
+
+When the user asks "What is the state of this project?" or opens an existing project, perform this snapshot process:
+
+1. **Read `.ppd/README.md`**: Obtain the documentation strategy and writing cadence conventions
+2. **Read `.ppd/01-overview/project-overview.md`**: Obtain positioning, boundaries, and key decisions
+3. **Read `.ppd/03-plan/roadmap.md`**: Obtain the slice plan and current progress
+4. **Read `.ppd/05-modules/README.md`**: Obtain each module's D-status table
+5. **Read `.ppd/02-architecture/tech-stack.md`** (if it exists): Obtain technology choices
+
+Summarize using this format:
+
+```text
+Project: [name]
+Positioning: [one sentence extracted from the overview]
+Current phase: [slice status extracted from the roadmap]
+Progress: S1a [in progress] / S1b [not started] ...
+
+Module confidence:
+  ├ Account and permissions  D3 in implementation (reference documentation is usable)
+  ├ Document management      D1 draft (not validated)
+  └ Knowledge-base engine    D0 (not designed)
+
+What can be done next:
+  Incomplete items in the current slice (see Development Task Navigation)
 ```
 
-如果 .ppd/ 目录不存在或大部分文档缺失，提示用户当前项目尚未进行渐进式设计初始化，建议运行首次激活流程。
+If `.ppd/` does not exist or most documents are missing, tell the user that progressive-design initialization has not yet been performed for the project and suggest running the first-activation process.
 
-## 已有项目适配（逆向校准）
+## Existing-Project Adaptation (Reverse Calibration)
 
-当项目已有代码且 `.ppd/` 缺失或过时时，读取 [references/migration.md](references/migration.md)，按其中的逆向校准流程适配。只在处理存量项目时读取该文件。
+When a project already contains code and `.ppd/` is missing or outdated, read [references/migration.md](references/migration.md) and follow its reverse-calibration process. Read that file only when handling an existing project.
 
-保留三个核心约定：
+Preserve these three core conventions:
 
-- 以当前代码为事实来源，已实现但未文档化的模块先标记为 D4（逆向）
-- 存量项目的切片是“文档化 + 校准”闭环，不重复设计已实现功能
-- 首个切片选择覆盖核心数据流且文档量最少的最短路径
+- Treat the current code as the source of truth; mark implemented but undocumented modules as D4 (reverse-engineered)
+- A slice in an existing project is a "documentation + calibration" loop; do not redesign functionality that is already implemented
+- Choose a shortest path for the first slice that covers the core data flow with the least documentation
 
-## 文档模板参考
+## Documentation Template Reference
 
-创建或更新 `.ppd/` 文档时，按需读取 [references/templates.md](references/templates.md) 中与当前产出物对应的单个模板。不要为了创建一种文档加载无关模板，也不要在已有项目规范可复用时另建竞争性文档。
+When creating or updating `.ppd/` documentation, read only the template corresponding to the current artifact from [references/templates.md](references/templates.md). Do not load unrelated templates merely to create one kind of document, and do not create competing documentation when an existing project convention can be reused.
 
-## 判断标准
+## Decision Standard
 
-写任何一篇文档前，先回答三个问题。答不上来 → 这篇文档不该现在写：
+Before writing any document, answer these three questions. If they cannot be answered → the document should not be written now:
 
-> **谁读？什么时候读？读了要做什么决定？**
+> **Who will read it? When will they read it? What decision will they make after reading it?**
 
-示例：
+Examples:
 
-- "这篇模块文档以后可能会有人看" → 不写
-- "下周一实现这个模块的开发人员要确定接口参数" → 写 L1
+- "Someone might read this module document someday" → Do not write it
+- "The developer implementing this module next Monday needs to determine the interface parameters" → Write L1
 
-## 相关
+## Related
 
-- 这是方法论文档，不绑定任何技术栈
+- This is a methodology document and is not tied to any technology stack
