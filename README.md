@@ -1,31 +1,40 @@
 # Progressive Project Design
 
-[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+[中文](README.zh.md) | English
 
-一个面向 AI 编程代理的渐进式项目设计 Skill。它通过 Just-in-Time Design（按需设计）、垂直切片以及代码↔文档校准，让项目文档随着实现演进，同时避免 Big Design Up Front。
+A progressive project-design Skill for AI coding agents. It combines Just-in-Time Design, vertical slices, and code-to-document calibration so documentation evolves with implementation without turning into Big Design Up Front.
 
-## 核心原则
+## Core principles
 
-> 文档是决策的产物，不是决策的起点。
+> Documentation is an output of decisions, not their starting point.
 
-- **按需设计**：只细化当前决策或当前切片需要的内容。
-- **切片驱动**：以端到端可运行、可验证的最小闭环为设计单位。
-- **及时停笔**：完成当前阶段产出后停止，不提前设计后续范围。
-- **实现校准**：切片完成后，用代码、测试、配置和运行行为更新文档。
-- **双向关系**：在模块文档中维护接口代码位置、依赖和反向链接。
+- **Design on demand:** Detail only what the current decision or slice needs.
+- **Slice-driven delivery:** Design around the smallest runnable, verifiable end-to-end loop.
+- **Stop at the current artifact:** Do not pre-design later scope.
+- **Calibrate after implementation:** Update documents from code, tests, configuration, and observed behavior.
+- **Maintain two-way relationships:** Record code locations, dependencies, and backlinks in module documents.
 
-## 状态模型
+## Progressive loading
 
-| 维度 | 状态 |
+`SKILL.md` is the routing entry point. Detailed workflows are split into `references/` and should be loaded only for the current task: initialization, existing-project analysis, directory-structure analysis, requirements, slice planning, verification/backtesting, implementation logs, calibration, navigation, and snapshots.
+
+Two required artifacts are part of the workflow:
+
+- Existing projects produce `.ppd/01-overview/project-structure.md` from observed code and configuration. New projects choose a structure only after requirements and technology options are confirmed.
+- Every slice defines verification cases before implementation: a success path, boundary case, failure/recovery case, and relevant regression case. Time-series, trading, recommendation, and model work may use the specialized backtest form.
+
+## State model
+
+| Dimension | States |
 |---|---|
-| 文档成熟度 | `D0` 未设计 → `D1` 草稿 → `D2` 可开工 → `D3` 实现中 → `D4` 已校准 |
-| 设计深度 | `L0` 边界 → `L1` 当前切片所需 → `L2` 完整细化 |
+| Document maturity | `D0` registered → `D1` draft → `D2` ready → `D3` implementing → `D4` calibrated |
+| Design depth | `L0` boundary → `L1` current-slice detail → `L2` full relevant detail |
 
-通常以 L1 开工；只有当前实现确实需要边界情况、异常处理、性能等约束时才进入 L2。
+L1 is normally enough to start implementation. Use L2 only when the current work needs edge cases, failure handling, performance, or similar constraints.
 
-## 项目文档体系
+## Project documentation
 
-Skill 使用 `.ppd/` 作为渐进式文档入口：
+The Skill uses `.ppd/` as its progressive-documentation entry point:
 
 ```text
 .ppd/
@@ -33,94 +42,76 @@ Skill 使用 `.ppd/` 作为渐进式文档入口：
 ├── 01-overview/
 ├── 02-architecture/
 ├── 03-plan/
-├── 04-progress/
-│   └── <slice>/
+├── 04-progress/<slice>/
 └── 05-modules/
 ```
 
-首次使用时检查现有结构，只建立必要骨架。已有代码的项目采用逆向校准：从当前实现提取模块、接口、数据模型和依赖，再逐个切片补齐文档。
+On first use, it checks existing structure and creates only the necessary skeleton. Existing codebases use reverse calibration: extract modules, interfaces, data models, dependencies, and the current directory structure from implementation, then document one slice at a time.
 
-## 五阶段节奏
+## Five-stage rhythm
 
-| 阶段 | 触发点 | 产出 |
+| Stage | Trigger | Output |
 |---|---|---|
-| 骨架 | 项目初始化 | `.ppd/README.md` 和最小目录 |
-| 需求 | 边界确认后 | 项目定位、范围、关键决策和非目标 |
-| 切片启动 | 当前切片准备实现 | 技术选择、相关模块 L1、路线图登记 |
-| 实现中 | 发生有意义的变更 | 简短开发日志、决策原因和遗留事项 |
-| 校准 | 切片实现完成 | D3→D4、代码位置、偏差和反向链接 |
+| Skeleton | Project initialization | `.ppd/README.md` and minimum directories |
+| Requirements | Boundaries are confirmed | Positioning, scope, decisions, and non-goals |
+| Slice start | A slice is ready to begin | Required technology choices, module L1 documents, verification cases, roadmap entry |
+| Implementation | A meaningful change occurs | Short log, decision reason, verification result, and remaining issues |
+| Calibration | Slice implementation finishes | D3→D4, code locations, deviations, and backlinks |
 
-## 适用场景
+## Use cases
 
-- 为新项目建立轻量、可演进的架构文档；
-- 将已有项目迁移到渐进式设计，同时保留现有 README、ADR 和 RFC；
-- 规划端到端垂直切片；
-- 根据路线图、模块 L1 文档和代码确定下一项任务；
-- 排查实现与文档之间的偏差；
-- 在切片完成后生成回顾并校准模块文档。
+- Establish lightweight, evolvable architecture documentation.
+- Summarize an existing project's directory structure and implementation boundaries.
+- Adopt the method in an existing project while preserving README, ADR, and RFC conventions.
+- Plan verifiable end-to-end vertical slices.
+- Define acceptance, replay, regression, or backtest cases before implementation.
+- Determine the next task from the roadmap, module L1 documents, verification cases, and code.
+- Investigate drift between implementation and documentation.
+- Summarize a finished slice and calibrate affected modules.
 
-## 安装
+## Installation
 
-仓库根目录就是完整的 [Agent Skills](https://agentskills.io/) 技能目录。将仓库克隆到对应 Agent 的全局 Skill 目录：
+The repository root is a complete [Agent Skills](https://agentskills.io/) directory. Clone it into the global Skill directory used by your agent:
 
 | Agent | Windows | macOS / Linux |
 |---|---|---|
 | Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
 | Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
 | Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
-| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
 
-PowerShell 示例：
+PowerShell example:
 
 ```powershell
 git clone https://github.com/xiaoda001/progressive-project-design.git `
   "$env:USERPROFILE\.codex\skills\progressive-project-design"
 ```
 
-macOS / Linux 示例：
-
-```bash
-git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.claude/skills/progressive-project-design
-```
-
-安装后重新启动 Agent，或使用其 Skill 刷新功能。更新已安装版本：
+Update an installed copy with:
 
 ```bash
 git -C <agent-skill-directory>/progressive-project-design pull --ff-only
 ```
 
-## 使用示例
+## Usage examples
 
 ```text
-$progressive-project-design 检查这个项目的渐进式设计状态，并告诉我最小的下一步
-$progressive-project-design 为这个新项目建立最小的 .ppd 文档骨架
-$progressive-project-design 根据当前路线图规划下一个垂直切片
-$progressive-project-design 校准当前切片涉及的模块文档
+$progressive-project-design Inspect this project's progressive-design state and report the smallest justified next step
+$progressive-project-design Summarize the current project's directory structure
+$progressive-project-design Plan the next vertical slice and define its verification cases
+$progressive-project-design Calibrate the module documents affected by the current slice
 ```
 
-Claude Code 使用斜杠形式，例如：
-
-```text
-/progressive-project-design 检查当前项目状态
-```
-
-## 仓库结构
+## Repository structure
 
 ```text
 progressive-project-design/
 ├── SKILL.md
 ├── agents/openai.yaml
 ├── references/
-│   ├── migration.md
-│   └── templates.md
 ├── README.md
-├── README.en.md
-├── README.ja.md
-└── README.ko.md
+└── README.zh.md
 ```
 
-## 许可证
+## License
 
 [MIT License](LICENSE)
