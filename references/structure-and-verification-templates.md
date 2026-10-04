@@ -47,12 +47,14 @@ Path: `.ppd/03-plan/<slice>-verification.md`
 
 ## Cases
 
-| ID | Scenario | Fixed input/fixture | Expected result | Command | Evidence | Status |
-|---|---|---|---|---|---|---|
-| S1-V1 | Main success path | ... | ... | ... | ... | pending |
-| S1-V2 | Boundary input | ... | ... | ... | ... | pending |
-| S1-V3 | Failure/recovery | ... | ... | ... | ... | pending |
-| S1-V4 | Regression | ... | ... | ... | ... | pending |
+| ID | Type | Scenario | Fixed input/fixture | Expected result | Test file/case | Command | Evidence | Status |
+|---|---|---|---|---|---|---|---|---|
+| S1-V1 | acceptance | Main success path | ... | ... | planned/TBD | planned/TBD | ... | pending |
+| S1-V2 | unit | Changed behavior or boundary | ... | ... | planned/TBD | planned/TBD | ... | pending |
+| S1-V3 | unit or acceptance | Failure/recovery, when applicable | ... | ... | planned/TBD | planned/TBD | ... | pending |
+| S1-V4 | regression | Existing behavior, when applicable | ... | ... | planned/TBD | planned/TBD | ... | pending |
+
+Allowed statuses: `pending`, `passed`, `failed`, `not run`, `not applicable`. Attach evidence to passed cases and a reason to `not run` or `not applicable` cases. Finalize planned/TBD test locations and commands during implementation.
 ```
 
 For time-series, trading, recommendation, or model work, also record dataset version, time window, parameters, metrics, thresholds, baseline, and reproducibility controls.
