@@ -21,7 +21,7 @@ A progressive project-design Skill for AI coding agents. It combines Just-in-Tim
 Two required artifacts are part of the workflow:
 
 - Existing projects produce `.ppd/01-overview/project-structure.md` from observed code and configuration. New projects choose a structure only after requirements and technology options are confirmed.
-- Every slice defines verification cases before implementation: a success path, boundary case, failure/recovery case, and relevant regression case. Time-series, trading, recommendation, and model work may use the specialized backtest form.
+- Every behavior-changing slice plans a success path, relevant boundary and failure/recovery cases, applicable regression cases, and unit-test coverage before implementation. After implementation, tests are selected from the change's impact scope; time-series, trading, recommendation, and model work may use the specialized backtest form.
 
 ## State model
 
@@ -55,8 +55,12 @@ On first use, it checks existing structure and creates only the necessary skelet
 | Skeleton | Project initialization | `.ppd/README.md` and minimum directories |
 | Requirements | Boundaries are confirmed | Positioning, scope, decisions, and non-goals |
 | Slice start | A slice is ready to begin | Required technology choices, module L1 documents, verification cases, roadmap entry |
-| Implementation | A meaningful change occurs | Short log, decision reason, verification result, and remaining issues |
+| Implementation | A meaningful change occurs | Impact scope, selected tests, commands and results, decision reason, and remaining issues |
 | Calibration | Slice implementation finishes | D3→D4, code locations, deviations, and backlinks |
+
+## Verification and tests
+
+For behavior changes, add or update unit tests for changed logic and relevant boundary or failure cases. After implementation, analyze affected units, interfaces, dependencies, and callers; run the changed unit's tests and relevant regressions, widening to the affected module or package suite for cross-unit changes. Record the scope, test choice, commands, results, and evidence. If a test cannot be authored or run, record why, alternative verification, and remaining risk. Documentation-only changes use applicable documentation checks instead of unit tests. See the [verification workflow](references/verification-and-backtest.md).
 
 ## Use cases
 
@@ -65,6 +69,7 @@ On first use, it checks existing structure and creates only the necessary skelet
 - Adopt the method in an existing project while preserving README, ADR, and RFC conventions.
 - Plan verifiable end-to-end vertical slices.
 - Define acceptance, replay, regression, or backtest cases before implementation.
+- Add unit tests for behavior changes and select regression tests from the impact scope.
 - Determine the next task from the roadmap, module L1 documents, verification cases, and code.
 - Investigate drift between implementation and documentation.
 - Summarize a finished slice and calibrate affected modules.
