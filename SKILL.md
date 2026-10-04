@@ -64,12 +64,17 @@ Do not create future slice directories until the slice is registered in the road
 
 ## Required slice invariant
 
-Before implementing a slice, record both:
+Before implementing a slice, record:
 
 - a completion condition: what can run or be demonstrated;
-- verification cases: at least the main success path, a boundary case, a failure case, and any required regression case.
+- applicable verification cases: the main success path, a relevant boundary case, a failure/recovery case, and a regression case when prior behavior exists;
+- planned unit-test coverage for new or changed behavior. Name the expected test file/case and command when known; if implementation details are not yet known, mark them as planned or `TBD` and finalize them during implementation.
 
-For financial, time-series, recommendation, or model work, verification cases may be called backtests and must specify a fixed dataset, parameters, metrics, and reproducible execution command. For ordinary business software, use verification, acceptance, replay, or regression cases instead.
+Add or update unit tests for behavior changes, following repository conventions and covering changed logic plus relevant boundary and failure behavior. If the behavior cannot reasonably be isolated in a unit test, use the most appropriate available test level and record why. Do not add a new test framework outside the slice's scope without justification.
+
+After implementation, analyze the impact scope of code or behavior changes before verification. Identify changed units, interfaces, dependencies, existing callers, and prior behavior. For a change contained within one unit, run that unit's tests and relevant regressions. For cross-unit or interface changes, include affected dependents and the relevant module or package suite. Use the full repository suite when a shared/core contract affects multiple areas, or when no bounded suite provides meaningful coverage; if impact remains unclear after investigation, run the broadest bounded relevant suite and explain the choice. For documentation-only changes, do not run unit tests; use applicable documentation checks when available. For configuration-only changes, select tests according to the behavior the configuration can affect. Log the scope, selection rationale, commands, results, evidence, and gaps. If a test cannot be authored or run, record why, alternative verification, and remaining risk; never report an unrun test as passing.
+
+For financial, time-series, recommendation, or model work, verification cases may be called backtests and must specify a fixed dataset, parameters, metrics, and reproducible execution command. For ordinary business software, use verification, acceptance, replay, or regression cases instead. Run unit tests selected from impact analysis when code behavior changes; documentation-only changes use applicable documentation checks instead.
 
 ## Decision standard
 
