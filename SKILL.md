@@ -14,7 +14,7 @@ Always respond in the user's language. This skill treats documentation as an out
 - Keep uninvolved modules at D0; do not pre-design later scope.
 - Stop after the current stage's artifact. Continue only when a new trigger exists.
 - Treat existing code as the source of truth during reverse calibration.
-- Keep project documentation in Git by default. Do not add `.ppd/` to `.gitignore` unless the user or project policy explicitly requires it.
+- Keep generated `.ppd/` project documentation local: if the project root `.gitignore` already exists, add `.ppd/` while preserving its existing rules; if it does not exist, leave it absent. Do not stage, commit, or upload `.ppd/` to the Git repository.
 
 ## Status model
 
@@ -44,9 +44,10 @@ Read only the reference needed for the current task. Do not load every reference
 ## First activation decision tree
 
 1. Check whether the project root contains `.ppd/`.
-2. If it is a new project, create only the skeleton and stop.
-3. If code already exists and `.ppd/` is missing or stale, perform one reverse-analysis pass and create clearly marked draft/reverse-engineered artifacts; do not redesign implemented behavior.
-4. If `.ppd/` is healthy, read the project snapshot and continue at the current stage; do not repeat initialization.
+2. If the project root `.gitignore` exists, add an entry for `.ppd/` while preserving all existing ignore rules. If it does not exist, do not create it.
+3. If it is a new project, create only the skeleton and stop.
+4. If code already exists and `.ppd/` is missing or stale, perform one reverse-analysis pass and create clearly marked draft/reverse-engineered artifacts; do not redesign implemented behavior.
+5. If `.ppd/` is healthy, read the project snapshot and continue at the current stage; do not repeat initialization.
 
 The initial directory skeleton is:
 

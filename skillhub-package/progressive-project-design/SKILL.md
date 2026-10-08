@@ -1,0 +1,99 @@
+---
+name: progressive-project-design
+description: Guides AI coding agents through progressive, slice-driven project design and code-to-document calibration. Use for project initialization, existing-project documentation, architecture decisions, vertical slices, verification cases, next-task navigation, and documentation calibration.
+slug: progressive-project-design
+displayName: 渐进式项目设计
+version: 1.1.0
+summary: 以垂直切片、按需设计和代码文档校准帮助 AI 编程代理渐进式设计项目，并规划测试与影响范围回归验证。
+license: MIT
+---
+
+# Progressive Project Design
+
+Always respond in the user's language. This skill treats documentation as an output of decisions, not as Big Design Up Front.
+
+## Operating principles
+
+- Design only what the current decision or vertical slice needs.
+- Use the smallest runnable, verifiable end-to-end slice as the planning unit.
+- Keep uninvolved modules at D0; do not pre-design later scope.
+- Stop after the current stage's artifact. Continue only when a new trigger exists.
+- Treat existing code as the source of truth during reverse calibration.
+- Keep generated `.ppd/` project documentation local: if the project root `.gitignore` already exists, add `.ppd/` while preserving its existing rules; if it does not exist, leave it absent. Do not stage, commit, or upload `.ppd/` to the Git repository.
+
+## Status model
+
+| Dimension | Values | Meaning |
+|---|---|---|
+| Documentation maturity | D0 → D1 → D2 → D3 → D4 | unregistered → draft → approved → implementing → calibrated |
+| Design depth | L0 → L1 → L2 | boundary → current-slice detail → full relevant detail |
+
+Use `D4-reverse-engineered` for documentation extracted from implemented code until its scope and behavior have been checked. Use L2 only when the current work requires edge cases, failure handling, performance, or similar constraints.
+
+## Progressive disclosure and routing
+
+Read only the reference needed for the current task. Do not load every reference by default.
+
+| User intent or project state | Read next |
+|---|---|
+| First activation or missing `.ppd/` | [initialization.md](references/initialization.md), then [directory-structure.md](references/directory-structure.md) |
+| Existing project without reliable `.ppd/` | [migration.md](references/migration.md), [existing-project.md](references/existing-project.md), then [directory-structure.md](references/directory-structure.md) |
+| Confirming requirements | [requirements-confirmation.md](references/requirements-confirmation.md) |
+| Planning or starting a slice | [slice-planning.md](references/slice-planning.md), [verification-and-backtest.md](references/verification-and-backtest.md) |
+| Implementing a slice | [implementation-log.md](references/implementation-log.md) |
+| Asking what to do next | [task-navigation.md](references/task-navigation.md) |
+| Slice completed or docs drifted | [calibration.md](references/calibration.md) |
+| Asking for project state | [project-snapshot.md](references/project-snapshot.md) |
+| Creating or updating a `.ppd/` artifact | Read only the matching section in [templates.md](references/templates.md); for structure or verification artifacts also read [structure-and-verification-templates.md](references/structure-and-verification-templates.md) |
+
+## First activation decision tree
+
+1. Check whether the project root contains `.ppd/`.
+2. If the project root `.gitignore` exists, add an entry for `.ppd/` while preserving all existing ignore rules. If it does not exist, do not create it.
+3. If it is a new project, create only the skeleton and stop.
+4. If code already exists and `.ppd/` is missing or stale, perform one reverse-analysis pass and create clearly marked draft/reverse-engineered artifacts; do not redesign implemented behavior.
+5. If `.ppd/` is healthy, read the project snapshot and continue at the current stage; do not repeat initialization.
+
+The initial directory skeleton is:
+
+```text
+.ppd/
+├── README.md
+├── 01-overview/
+├── 02-architecture/
+├── 03-plan/
+├── 04-progress/
+└── 05-modules/
+```
+
+Do not create future slice directories until the slice is registered in the roadmap.
+
+## Required slice invariant
+
+Before implementing a slice, record:
+
+- a completion condition: what can run or be demonstrated;
+- applicable verification cases: the main success path, a relevant boundary case, a failure/recovery case, and a regression case when prior behavior exists;
+- planned unit-test coverage for new or changed behavior. Name the expected test file/case and command when known; if implementation details are not yet known, mark them as planned or `TBD` and finalize them during implementation.
+
+Add or update unit tests for behavior changes, following repository conventions and covering changed logic plus relevant boundary and failure behavior. If the behavior cannot reasonably be isolated in a unit test, use the most appropriate available test level and record why. Do not add a new test framework outside the slice's scope without justification.
+
+After implementation, analyze the impact scope of code or behavior changes before verification. Identify changed units, interfaces, dependencies, existing callers, and prior behavior. For a change contained within one unit, run that unit's tests and relevant regressions. For cross-unit or interface changes, include affected dependents and the relevant module or package suite. Use the full repository suite when a shared/core contract affects multiple areas, or when no bounded suite provides meaningful coverage; if impact remains unclear after investigation, run the broadest bounded relevant suite and explain the choice. For documentation-only changes, do not run unit tests; use applicable documentation checks when available. For configuration-only changes, select tests according to the behavior the configuration can affect. Log the scope, selection rationale, commands, results, evidence, and gaps. If a test cannot be authored or run, record why, alternative verification, and remaining risk; never report an unrun test as passing.
+
+For financial, time-series, recommendation, or model work, verification cases may be called backtests and must specify a fixed dataset, parameters, metrics, and reproducible execution command. For ordinary business software, use verification, acceptance, replay, or regression cases instead. Run unit tests selected from impact analysis when code behavior changes; documentation-only changes use applicable documentation checks instead.
+
+## Decision standard
+
+Before writing any document, answer:
+
+> Who will read it? When will they read it? What decision will they make after reading it?
+
+If those answers are unclear, do not create the document yet.
+
+## Relationship invariants
+
+- `.ppd/README.md` is the single navigation entry point.
+- Module documents contain responsibility, interfaces, dependencies, code locations, and backlinks.
+- Code links must use `path#line` and be updated during calibration.
+- D4 claims require implementation evidence; a filename alone is not evidence.
+- A calibration aligns existing scope; it must not silently add new scope.
