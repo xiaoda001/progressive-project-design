@@ -27,7 +27,7 @@ Two required artifacts are part of the workflow:
 
 | Dimension | States |
 |---|---|
-| Document maturity | `D0` registered → `D1` draft → `D2` ready → `D3` implementing → `D4` calibrated |
+| Document maturity | `D0` unregistered → `D1` draft → `D2` approved → `D3` implementing → `D4` calibrated |
 | Design depth | `L0` boundary → `L1` current-slice detail → `L2` full relevant detail |
 
 L1 is normally enough to start implementation. Use L2 only when the current work needs edge cases, failure handling, performance, or similar constraints.
@@ -54,13 +54,13 @@ On first use, it checks existing structure and creates only the necessary skelet
 |---|---|---|
 | Skeleton | Project initialization | `.ppd/README.md` and minimum directories |
 | Requirements | Boundaries are confirmed | Positioning, scope, decisions, and non-goals |
-| Slice start | A slice is ready to begin | Required technology choices, module L1 documents, verification cases, roadmap entry |
+| Slice start | A slice is ready to begin | Relevant technology decisions (if any), module L1 documents, verification cases, roadmap entry |
 | Implementation | A meaningful change occurs | Impact scope, selected tests, commands and results, decision reason, and remaining issues |
 | Calibration | Slice implementation finishes | D3→D4, code locations, deviations, and backlinks |
 
 ## Verification and tests
 
-For behavior changes, add or update unit tests for changed logic and relevant boundary or failure cases. After implementation, analyze affected units, interfaces, dependencies, and callers; run the changed unit's tests and relevant regressions, widening to the affected module or package suite for cross-unit changes. Record the scope, test choice, commands, results, and evidence. If a test cannot be authored or run, record why, alternative verification, and remaining risk. Documentation-only changes use applicable documentation checks instead of unit tests. See the [verification workflow](references/verification-and-backtest.md).
+For behavior changes, add or update unit tests for changed logic and relevant boundary or failure cases. If behavior cannot reasonably be isolated in a unit test, use the most appropriate available test level and record why. After implementation, analyze affected units, interfaces, dependencies, and callers; run the changed unit's tests and relevant regressions, widening to the affected module or package suite for cross-unit changes. Record the scope, test choice, commands, results, and evidence. If a test cannot be authored or run, record why, alternative verification, and remaining risk. Documentation-only changes use applicable documentation checks instead of unit tests. See the [verification workflow](references/verification-and-backtest.md).
 
 ## Use cases
 
