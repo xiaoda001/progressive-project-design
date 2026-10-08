@@ -3,7 +3,7 @@ name: progressive-project-design
 description: Guides AI coding agents through progressive, slice-driven project design and code-to-document calibration. Use for project initialization, existing-project documentation, architecture decisions, vertical slices, verification cases, next-task navigation, and documentation calibration.
 slug: progressive-project-design
 displayName: 渐进式项目设计
-version: 1.1.1
+version: 1.1.2
 summary: 以垂直切片、按需设计和代码文档校准帮助 AI 编程代理渐进式设计项目，并规划测试与影响范围回归验证。
 license: MIT
 ---

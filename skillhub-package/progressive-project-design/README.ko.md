@@ -59,28 +59,20 @@ Skill은 `.ppd/`를 점진적 문서의 단일 진입점으로 사용합니다.
 
 ## 설치
 
-저장소 루트가 완전한 [Agent Skills](https://agentskills.io/) 디렉터리입니다.
+아래 prompt를 AI 코딩 에이전트에 복사합니다:
 
-| Agent | Windows | macOS / Linux |
-|---|---|---|
-| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
-| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
-| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
-| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
-
-```bash
-git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.claude/skills/progressive-project-design
+```text
+请从 https://github.com/xiaoda001/progressive-project-design 安装此 Skill
 ```
 
-업데이트:
+## 사용 단계
 
-```bash
-git -C <agent-skill-directory>/progressive-project-design pull --ff-only
-```
+1. 코딩 에이전트에서 작업할 프로젝트를 엽니다.
+2. `$progressive-project-design`을 호출하고 작업 내용과 신규/기존 프로젝트 여부를 알려줍니다.
+3. 현재 단계의 결과물을 검토합니다. Skill은 `.ppd/`와 프로젝트 근거를 확인하고 필요한 단계만 진행합니다.
+4. 다음 단계로 넘어갈 준비가 되면 슬라이스 계획, 구현, 문서 보정 등 다음 작업을 알려 다시 호출합니다.
 
-## 사용 예시
+예시:
 
 ```text
 $progressive-project-design 이 프로젝트의 점진적 설계 상태와 가장 작은 다음 작업을 확인하세요

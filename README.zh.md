@@ -66,37 +66,20 @@ Skill 使用 `.ppd/` 作为渐进式文档入口：
 
 ## 安装
 
-仓库根目录就是完整的 [Agent Skills](https://agentskills.io/) 技能目录。将仓库克隆到对应 Agent 的全局 Skill 目录：
+将以下 prompt 复制给你的 AI 编程代理：
 
-| Agent | Windows | macOS / Linux |
-|---|---|---|
-| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
-| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
-| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
-| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
-
-PowerShell 示例：
-
-```powershell
-git clone https://github.com/xiaoda001/progressive-project-design.git `
-  "$env:USERPROFILE\.codex\skills\progressive-project-design"
+```text
+请从 https://github.com/xiaoda001/progressive-project-design 安装此 Skill
 ```
 
-macOS / Linux 示例：
+## 使用步骤
 
-```bash
-git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.claude/skills/progressive-project-design
-```
+1. 在编程代理中打开要处理的项目。
+2. 通过 `$progressive-project-design` 调用 Skill，说明任务以及项目是新建还是已有项目。
+3. 查看当前阶段的产物。Skill 会检查 `.ppd/` 和项目现有证据，只处理当前需要的阶段。
+4. 准备好继续时，再次调用 Skill 并说明下一项任务，例如规划切片、实现切片或校准文档。
 
-安装后重新启动 Agent，或使用其 Skill 刷新功能。更新已安装版本：
-
-```bash
-git -C <agent-skill-directory>/progressive-project-design pull --ff-only
-```
-
-## 使用示例
+示例：
 
 ```text
 $progressive-project-design 检查这个项目的渐进式设计状态，并告诉我最小的下一步

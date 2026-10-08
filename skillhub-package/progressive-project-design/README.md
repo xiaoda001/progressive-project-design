@@ -76,28 +76,20 @@ For behavior changes, add or update unit tests for changed logic and relevant bo
 
 ## Installation
 
-The repository root is a complete [Agent Skills](https://agentskills.io/) directory. Clone it into the global Skill directory used by your agent:
+Copy this prompt into your AI coding agent:
 
-| Agent | Windows | macOS / Linux |
-|---|---|---|
-| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
-| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
-| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-
-PowerShell example:
-
-```powershell
-git clone https://github.com/xiaoda001/progressive-project-design.git `
-  "$env:USERPROFILE\.codex\skills\progressive-project-design"
+```text
+请从 https://github.com/xiaoda001/progressive-project-design 安装此 Skill
 ```
 
-Update an installed copy with:
+## Usage steps
 
-```bash
-git -C <agent-skill-directory>/progressive-project-design pull --ff-only
-```
+1. Open the project in your coding agent.
+2. Invoke `$progressive-project-design` and describe the task. Say whether this is a new or existing project.
+3. Review the current stage's output. The Skill checks `.ppd/` and available project evidence, then handles only the next relevant stage.
+4. When ready, invoke it again with the next task, such as planning a slice, implementing it, or calibrating its documents.
 
-## Usage examples
+Example prompts:
 
 ```text
 $progressive-project-design Inspect this project's progressive-design state and report the smallest justified next step
@@ -105,6 +97,8 @@ $progressive-project-design Summarize the current project's directory structure
 $progressive-project-design Plan the next vertical slice and define its verification cases
 $progressive-project-design Calibrate the module documents affected by the current slice
 ```
+
+In Claude Code, use the slash form, for example: `/progressive-project-design Inspect this project`.
 
 ## Repository structure
 

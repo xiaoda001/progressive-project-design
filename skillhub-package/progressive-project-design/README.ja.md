@@ -59,28 +59,20 @@ Skill は `.ppd/` を唯一の漸進的文書入口として使用します。
 
 ## インストール
 
-リポジトリのルートが完全な [Agent Skills](https://agentskills.io/) ディレクトリです。
+以下の prompt を AI コーディング Agent にコピーします：
 
-| Agent | Windows | macOS / Linux |
-|---|---|---|
-| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
-| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
-| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
-| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
-
-```bash
-git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.claude/skills/progressive-project-design
+```text
+请从 https://github.com/xiaoda001/progressive-project-design 安装此 Skill
 ```
 
-更新：
+## 使用手順
 
-```bash
-git -C <agent-skill-directory>/progressive-project-design pull --ff-only
-```
+1. コーディング Agent で対象プロジェクトを開きます。
+2. `$progressive-project-design` を呼び出し、作業内容と新規／既存プロジェクトのどちらかを伝えます。
+3. 現在の段階の成果物を確認します。Skill は `.ppd/` とプロジェクトの根拠を確認し、必要な段階だけを進めます。
+4. 続ける準備ができたら、スライス計画、実装、文書校正など次の作業を伝えて再度呼び出します。
 
-## 使用例
+例：
 
 ```text
 $progressive-project-design このプロジェクトの漸進的設計状態と最小の次の作業を確認してください
