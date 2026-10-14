@@ -1,6 +1,6 @@
 # Progressive Project Design
 
-[简体中文](README.zh.md) | [English](README.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 一个面向 AI 编程代理的渐进式项目设计 Skill。它通过 Just-in-Time Design（按需设计）、垂直切片以及代码↔文档校准，让项目文档随着实现演进，同时避免 Big Design Up Front。
 
@@ -103,12 +103,11 @@ Claude Code 使用斜杠形式，例如：
 ```text
 progressive-project-design/
 ├── SKILL.md
-├── agents/openai.yaml
+├── agents/
 ├── references/
-│   ├── migration.md
-│   └── templates.md
 ├── README.md
 ├── README.en.md
+├── README.zh.md
 ├── README.ja.md
 └── README.ko.md
 ```
