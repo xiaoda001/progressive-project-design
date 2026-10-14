@@ -1,6 +1,6 @@
 # Progressive Project Design
 
-[中文](README.md) | English
+[Simplified Chinese](README.md) | English
 
 A progressive project-design Skill for AI coding agents. It combines Just-in-Time Design, vertical slices, and code-to-document calibration so documentation evolves with implementation without turning into Big Design Up Front.
 

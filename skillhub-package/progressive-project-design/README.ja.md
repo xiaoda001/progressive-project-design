@@ -1,6 +1,6 @@
 # Progressive Project Design
 
-[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+[Simplified Chinese](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 AI コーディングエージェント向けの漸進的プロジェクト設計 Skill です。Just-in-Time Design、垂直スライス、コード↔文書の校正を組み合わせ、過剰な先行設計を避けながら文書を実装とともに進化させます。
 
