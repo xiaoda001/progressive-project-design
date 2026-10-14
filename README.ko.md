@@ -1,6 +1,6 @@
 # Progressive Project Design
 
-[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+[Simplified Chinese](README.md) | [English](README.en.md) | [日本語](README.ja.md)
 
 AI 코딩 에이전트를 위한 점진적 프로젝트 설계 Skill입니다. Just-in-Time Design, 수직 슬라이스, 코드↔문서 보정을 결합하여 과도한 선행 설계를 피하면서 문서가 구현과 함께 발전하도록 합니다.
 
@@ -13,12 +13,23 @@ AI 코딩 에이전트를 위한 점진적 프로젝트 설계 Skill입니다. J
 - 현재 산출물이 완성되면 멈추고 이후 범위를 미리 설계하지 않음
 - 코드, 테스트, 설정 및 실행 결과를 기반으로 문서 보정
 - 모듈 문서에 코드 위치, 의존성 및 역링크 유지
+- 요구사항을 수락 기준, 구현 위치, 검증 증거에 연결해 확인합니다.
+- 생성한 `.ppd/`는 사용하는 프로젝트의 `.gitignore`에서 제외하고 커밋하지 않습니다.
+
+## 필요한 내용만 선택해 읽기
+
+`SKILL.md`는 작업 흐름의 라우터입니다. 세부 절차는 `references/`에 나뉘어 있으며 초기화, 기존 프로젝트 분석, 디렉터리 구조, 요구사항, 슬라이스 계획, 검증/백테스트, 구현 로그, 검토 및 수락, 정밀 수정, 보정, 다음 작업 안내, 프로젝트 스냅샷 중 현재 작업에 필요한 내용만 읽습니다.
+
+이 흐름은 다음 두 가지 산출물을 중요하게 다룹니다.
+
+- 기존 프로젝트는 실제 코드와 설정을 근거로 `.ppd/01-overview/project-structure.md`를 작성합니다. 새 프로젝트는 요구사항과 기술 선택지를 확인한 뒤 구조를 정합니다.
+- 동작 변경 슬라이스는 구현 전에 주요 성공 경로, 해당되는 경계 및 실패/복구 사례, 필요한 회귀 사례와 단위 테스트를 계획합니다. 구현 후에는 변경 영향 범위에 따라 테스트를 선택합니다. 시계열, 거래, 추천 및 모델 작업에는 전용 백테스트 형식을 사용할 수 있습니다.
 
 ## 상태 모델
 
 | 차원 | 상태 |
 |---|---|
-| 문서 성숙도 | `D0` 등록 → `D1` 초안 → `D2` 구현 준비 → `D3` 구현 중 → `D4` 보정 완료 |
+| 문서 성숙도 | `D0` 미등록 → `D1` 초안 → `D2` 승인됨 → `D3` 구현 중 → `D4` 보정 완료 |
 | 설계 깊이 | `L0` 경계 → `L1` 현재 슬라이스에 필요 → `L2` 필요한 상세 설계 완료 |
 
 일반적으로 L1에서 구현을 시작하고 현재 작업에 예외 처리, 성능 등의 제약이 실제로 필요할 때만 L2로 진행합니다.
@@ -45,39 +56,50 @@ Skill은 `.ppd/`를 점진적 문서의 단일 진입점으로 사용합니다.
 |---|---|---|
 | 골격 | 프로젝트 초기화 | `.ppd/README.md`와 최소 디렉터리 |
 | 요구사항 | 경계 확인 후 | 목적, 범위, 결정 및 비목표 |
-| 슬라이스 시작 | 구현 준비 시 | 필요한 기술 선택, 모듈 L1, 로드맵 |
-| 구현 중 | 의미 있는 변경 | 짧은 로그, 결정 이유, 남은 문제 |
+| 슬라이스 시작 | 구현 준비 시 | 현재 슬라이스에 해당하는 기술 결정(필요한 경우), 모듈 L1, 로드맵 |
+| 구현 중 | 의미 있는 변경 | 영향 범위, 선택한 테스트, 실행 명령과 결과, 결정 이유, 남은 문제; 필요에 따라 검토 및 요구사항 수락 확인 |
 | 보정 | 슬라이스 완료 | D3→D4, 코드 위치, 차이 및 역링크 |
+
+## 검증 및 테스트
+
+동작을 변경하는 슬라이스는 구현 전에 성공 경로, 해당되는 경계 및 실패/복구 사례, 필요한 회귀 사례를 정의하고 새로 추가하거나 변경한 동작의 단위 테스트를 계획합니다. 동작을 단위 테스트로 적절히 분리할 수 없으면 가장 적합한 테스트 수준을 선택하고 이유를 기록합니다. 구현 후 영향을 받는 단위, 인터페이스, 의존성, 호출자를 분석하고 해당 단위 테스트와 회귀 테스트를 실행합니다. 여러 단위에 걸친 변경은 영향을 받는 모듈 또는 패키지 테스트까지 범위를 넓힙니다. 영향 범위, 테스트 선택 이유, 명령, 결과, 증거를 기록합니다. 테스트를 작성하거나 실행할 수 없으면 이유, 대체 검증, 남은 위험을 기록합니다. 문서만 변경한 경우 단위 테스트 대신 적용 가능한 문서 검사를 수행합니다. 위험에 따라 코드를 검토하고 요구사항을 수락 기준, 구현 위치, 증거에 연결합니다. 자세한 내용은 [검토 및 수락](references/review-and-acceptance.md), [정밀 수정](references/targeted-repair.md), [검증 워크플로](references/verification-and-backtest.md)를 참조하세요.
+
+## 사용 사례
+
+- 새 프로젝트를 위한 가볍고 발전 가능한 아키텍처 문서를 작성합니다.
+- 기존 프로젝트의 디렉터리 구조와 구현 경계를 정리합니다.
+- 기존 README, ADR, RFC 관례를 유지하면서 점진적 설계를 도입합니다.
+- 검증 가능한 엔드투엔드 수직 슬라이스를 계획합니다.
+- 구현 전에 인수, 리플레이, 회귀 또는 백테스트 사례를 정의합니다.
+- 동작 변경에 단위 테스트를 추가하고 영향 범위에 따라 회귀 테스트를 선택합니다.
+- 로드맵, 모듈 L1 문서, 검증 사례 및 코드에서 다음 작업을 정합니다.
+- 구현과 문서 간의 차이를 조사합니다.
+- 완료된 슬라이스를 정리하고 관련 모듈 문서를 보정합니다.
 
 ## 설치
 
-저장소 루트가 완전한 [Agent Skills](https://agentskills.io/) 디렉터리입니다.
-
-| Agent | Windows | macOS / Linux |
-|---|---|---|
-| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
-| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
-| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
-| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
-
-```bash
-git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.claude/skills/progressive-project-design
-```
-
-업데이트:
-
-```bash
-git -C <agent-skill-directory>/progressive-project-design pull --ff-only
-```
-
-## 사용 예시
+아래 prompt를 AI 코딩 에이전트에서 사용합니다:
 
 ```text
-$progressive-project-design 이 프로젝트의 점진적 설계 상태와 가장 작은 다음 작업을 확인하세요
-$progressive-project-design 새 프로젝트용 최소 .ppd 골격을 만드세요
-$progressive-project-design 현재 로드맵에서 다음 수직 슬라이스를 계획하세요
+https://github.com/xiaoda001/progressive-project-design 에서 Progressive Project Design Skill을 설치하세요
+```
+
+## 사용 단계
+
+1. 코딩 에이전트에서 작업할 프로젝트를 엽니다.
+2. `$progressive-project-design`을 호출하고 작업 내용과 신규/기존 프로젝트 여부를 알려줍니다.
+3. 현재 단계의 결과물을 검토합니다. Skill은 `.ppd/`와 프로젝트 근거를 확인하고 필요한 단계만 진행합니다.
+4. 다음 단계로 넘어갈 준비가 되면 슬라이스 계획, 구현, 문서 보정 등 다음 작업을 알려 다시 호출합니다.
+
+예시:
+
+```text
+$progressive-project-design 이 프로젝트의 점진적 설계 상태를 확인하고 가장 작고 타당한 다음 작업을 알려주세요
+$progressive-project-design 현재 프로젝트의 디렉터리 구조를 요약하세요
+$progressive-project-design 새 프로젝트를 위한 최소 .ppd 문서 골격을 만드세요
+$progressive-project-design 다음 수직 슬라이스를 계획하고 검증 사례를 정의하세요
+$progressive-project-design 이 슬라이스를 검토하고 각 요구사항을 인수 증거에 연결하세요
+$progressive-project-design 이 실패의 근본 원인을 찾고 검증 가능한 최소 수정을 하세요
 $progressive-project-design 현재 슬라이스와 관련된 모듈 문서를 보정하세요
 ```
 

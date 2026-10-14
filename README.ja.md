@@ -1,6 +1,6 @@
 # Progressive Project Design
 
-[简体中文](README.md) | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+[Simplified Chinese](README.md) | [English](README.en.md) | [한국어](README.ko.md)
 
 AI コーディングエージェント向けの漸進的プロジェクト設計 Skill です。Just-in-Time Design、垂直スライス、コード↔文書の校正を組み合わせ、過剰な先行設計を避けながら文書を実装とともに進化させます。
 
@@ -13,12 +13,23 @@ AI コーディングエージェント向けの漸進的プロジェクト設�
 - 現在の成果物が完成したら止め、後続範囲を先に設計しない
 - コード、テスト、設定、実行結果を使って文書を校正する
 - モジュール文書にコード位置、依存関係、バックリンクを記録する
+- 要件を受け入れ基準、実装箇所、検証証拠に対応付けて確認する
+- 生成した `.ppd/` は利用プロジェクトの `.gitignore` で除外し、コミットしない
+
+## 必要な情報だけを読む
+
+`SKILL.md` は作業フローのルーターです。詳細な手順は `references/` に分かれており、初期化、既存プロジェクト分析、ディレクトリ構成、要件、スライス計画、検証／バックテスト、実装ログ、レビューと受け入れ、定点修正、校正、次の作業、プロジェクトスナップショットから現在の作業に必要なものだけを読みます。
+
+このフローでは、次の2種類の成果物を重視します。
+
+- 既存プロジェクトでは、実際のコードと設定を根拠に `.ppd/01-overview/project-structure.md` を作成します。新規プロジェクトでは、要件と技術選択肢を確認してから構成を決めます。
+- 振る舞いを変更するスライスでは、実装前に主経路、該当する境界・失敗と回復、必要な回帰ケース、ユニットテストを計画します。実装後は変更の影響範囲に応じてテストを選びます。時系列、取引、推薦、モデルの作業では専用のバックテスト形式を使えます。
 
 ## 状態モデル
 
 | 次元 | 状態 |
 |---|---|
-| 文書成熟度 | `D0` 登録 → `D1` 草案 → `D2` 実装可能 → `D3` 実装中 → `D4` 校正済み |
+| 文書成熟度 | `D0` 未登録 → `D1` 草案 → `D2` 承認済み → `D3` 実装中 → `D4` 校正済み |
 | 設計深度 | `L0` 境界 → `L1` 現在のスライスに必要 → `L2` 必要な詳細を完全化 |
 
 通常は L1 で実装を開始し、現在の実装が例外処理や性能などを本当に必要とする場合だけ L2 に進みます。
@@ -45,39 +56,50 @@ Skill は `.ppd/` を唯一の漸進的文書入口として使用します。
 |---|---|---|
 | 骨格 | プロジェクト初期化 | `.ppd/README.md` と最小ディレクトリ |
 | 要件 | 境界確認後 | 位置づけ、範囲、判断、非目標 |
-| スライス開始 | 実装準備時 | 必要な技術選択、モジュール L1、ロードマップ |
-| 実装中 | 意味のある変更 | 短いログ、判断理由、残課題 |
+| スライス開始 | 実装準備時 | 現在のスライスに関係する技術判断（必要な場合）、モジュール L1、ロードマップ |
+| 実装中 | 意味のある変更 | 影響範囲、選択したテスト、実行コマンドと結果、判断理由、残課題 |
 | 校正 | スライス完了 | D3→D4、コード位置、差異、バックリンク |
+
+## 検証とテスト
+
+振る舞いを変更するスライスでは、実装前に成功経路、該当する境界・失敗と回復のケース、必要な回帰ケースを定義し、新規または変更した振る舞いのユニットテストを計画します。振る舞いをユニットテストに適切に分離できない場合は、最も適切なテストレベルを選び、その理由を記録します。実装後に影響を受ける単位、インターフェース、依存関係、呼び出し元を分析し、該当するユニットテストと回帰テストを実行します。複数の単位にまたがる変更では、影響を受けるモジュールまたはパッケージのテストまで範囲を広げます。影響範囲、テスト選択の理由、コマンド、結果、証拠を記録します。テストを作成または実行できない場合は、理由、代替検証、残るリスクを記録します。文書のみの変更では、ユニットテストの代わりに適用可能な文書チェックを行います。リスクに応じてコードをレビューし、要件を受け入れ基準・実装箇所・証拠に対応付けます。詳しくは[レビューと受け入れ](references/review-and-acceptance.md)、[定点修正](references/targeted-repair.md)、[検証ワークフロー](references/verification-and-backtest.md)を参照してください。
+
+## 利用シーン
+
+- 新規プロジェクト向けに、軽量で進化可能なアーキテクチャ文書を作成する。
+- 既存プロジェクトのディレクトリ構成と実装境界を整理する。
+- 既存の README、ADR、RFC の慣習を保ちながら、漸進的設計を導入する。
+- 検証可能なエンドツーエンドの垂直スライスを計画する。
+- 実装前に受け入れ、リプレイ、回帰、またはバックテストのケースを定義する。
+- 振る舞いの変更にユニットテストを追加し、影響範囲に基づいて回帰テストを選ぶ。
+- ロードマップ、モジュール L1 文書、検証ケース、コードから次の作業を決める。
+- 実装と文書のずれを調査する。
+- 完了したスライスを振り返り、関連モジュールの文書を校正する。
 
 ## インストール
 
-リポジトリのルートが完全な [Agent Skills](https://agentskills.io/) ディレクトリです。
-
-| Agent | Windows | macOS / Linux |
-|---|---|---|
-| Codex | `%USERPROFILE%\.codex\skills\progressive-project-design` | `~/.codex/skills/progressive-project-design` |
-| Claude Code | `%USERPROFILE%\.claude\skills\progressive-project-design` | `~/.claude/skills/progressive-project-design` |
-| Qoder CLI | `%USERPROFILE%\.qoder\skills\progressive-project-design` | `~/.qoder/skills/progressive-project-design` |
-| TRAE | `%USERPROFILE%\.trae\skills\progressive-project-design` | `~/.trae/skills/progressive-project-design` |
-| TRAE CN | `%USERPROFILE%\.trae-cn\skills\progressive-project-design` | `~/.trae-cn/skills/progressive-project-design` |
-
-```bash
-git clone https://github.com/xiaoda001/progressive-project-design.git \
-  ~/.claude/skills/progressive-project-design
-```
-
-更新：
-
-```bash
-git -C <agent-skill-directory>/progressive-project-design pull --ff-only
-```
-
-## 使用例
+以下の prompt を AI コーディング Agent で使用します：
 
 ```text
-$progressive-project-design このプロジェクトの漸進的設計状態と最小の次の作業を確認してください
-$progressive-project-design 新規プロジェクト用の最小 .ppd 骨格を作成してください
-$progressive-project-design 現在のロードマップから次の垂直スライスを計画してください
+https://github.com/xiaoda001/progressive-project-design から Progressive Project Design Skill をインストールしてください
+```
+
+## 使用手順
+
+1. コーディング Agent で対象プロジェクトを開きます。
+2. `$progressive-project-design` を呼び出し、作業内容と新規／既存プロジェクトのどちらかを伝えます。
+3. 現在の段階の成果物を確認します。Skill は `.ppd/` とプロジェクトの根拠を確認し、必要な段階だけを進めます。
+4. 続ける準備ができたら、スライス計画、実装、文書校正など次の作業を伝えて再度呼び出します。
+
+例：
+
+```text
+$progressive-project-design このプロジェクトの漸進的設計状態を確認し、妥当な最小の次の作業を示してください
+$progressive-project-design 現在のプロジェクトのディレクトリ構成をまとめてください
+$progressive-project-design 新規プロジェクト用の最小 .ppd 文書骨格を作成してください
+$progressive-project-design 次の垂直スライスを計画し、検証ケースを定義してください
+$progressive-project-design このスライスをレビューし、各要件を受け入れ証拠に対応付けてください
+$progressive-project-design この障害の根本原因を調べ、検証できる最小の修正を行ってください
 $progressive-project-design 現在のスライスに関係するモジュール文書を校正してください
 ```
 

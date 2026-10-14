@@ -18,4 +18,4 @@ Read this file when `.ppd/` is absent, incomplete, or has never been initialized
 4. Mark inferred facts and contradictions explicitly.
 5. Do not redesign implemented behavior or claim that a generated draft is user-approved.
 
-The `.ppd/` directory is normally versioned. Ignore it only when the project explicitly requires local-only documentation.
+Ensure the project-root `.gitignore` excludes `.ppd/`, preserving existing rules or creating the file when needed. Do not stage, commit, or upload `.ppd/` to the Git repository. If `.ppd/` files are already tracked, report that ignore rules do not untrack them; do not change the Git index without an explicit request.
