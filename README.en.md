@@ -113,7 +113,6 @@ progressive-project-design/
 ├── references/
 ├── README.md
 ├── README.en.md
-├── README.zh.md
 ├── README.ja.md
 └── README.ko.md
 ```
