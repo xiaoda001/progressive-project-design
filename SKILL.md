@@ -14,7 +14,7 @@ Always respond in the user's language. This skill treats documentation as an out
 - Keep uninvolved modules at D0; do not pre-design later scope.
 - Stop after the current stage's artifact. Continue only when a new trigger exists.
 - Treat existing code as the source of truth during reverse calibration.
-- Keep generated `.ppd/` project documentation local: if the project root `.gitignore` already exists, add `.ppd/` while preserving its existing rules; if it does not exist, leave it absent. Do not stage, commit, or upload `.ppd/` to the Git repository.
+- Keep generated `.ppd/` project documentation local. Ensure the project-root `.gitignore` excludes `.ppd/`, preserving existing rules or creating the file when needed. Do not stage, commit, or upload `.ppd/`. If `.ppd/` files are already tracked, report that ignore rules do not untrack them; do not change the Git index without an explicit request.
 
 ## Status model
 
@@ -36,6 +36,8 @@ Read only the reference needed for the current task. Do not load every reference
 | Confirming requirements | [requirements-confirmation.md](references/requirements-confirmation.md) |
 | Planning or starting a slice | [slice-planning.md](references/slice-planning.md), [verification-and-backtest.md](references/verification-and-backtest.md) |
 | Implementing a slice | [implementation-log.md](references/implementation-log.md) |
+| Reviewing or accepting an implementation | [review-and-acceptance.md](references/review-and-acceptance.md) |
+| Diagnosing and fixing a reported defect | [targeted-repair.md](references/targeted-repair.md) |
 | Asking what to do next | [task-navigation.md](references/task-navigation.md) |
 | Slice completed or docs drifted | [calibration.md](references/calibration.md) |
 | Asking for project state | [project-snapshot.md](references/project-snapshot.md) |
@@ -44,7 +46,7 @@ Read only the reference needed for the current task. Do not load every reference
 ## First activation decision tree
 
 1. Check whether the project root contains `.ppd/`.
-2. If the project root `.gitignore` exists, add an entry for `.ppd/` while preserving all existing ignore rules. If it does not exist, do not create it.
+2. Ensure the project-root `.gitignore` excludes `.ppd/`, preserving existing ignore rules or creating the file when needed. If `.ppd/` files are already tracked, report this because ignore rules do not untrack existing files; do not change the Git index without an explicit request.
 3. If it is a new project, create only the skeleton and stop.
 4. If code already exists and `.ppd/` is missing or stale, perform one reverse-analysis pass and create clearly marked draft/reverse-engineered artifacts; do not redesign implemented behavior.
 5. If `.ppd/` is healthy, read the project snapshot and continue at the current stage; do not repeat initialization.
@@ -76,6 +78,8 @@ Add or update unit tests for behavior changes, following repository conventions 
 After implementation, analyze the impact scope of code or behavior changes before verification. Identify changed units, interfaces, dependencies, existing callers, and prior behavior. For a change contained within one unit, run that unit's tests and relevant regressions. For cross-unit or interface changes, include affected dependents and the relevant module or package suite. Use the full repository suite when a shared/core contract affects multiple areas, or when no bounded suite provides meaningful coverage; if impact remains unclear after investigation, run the broadest bounded relevant suite and explain the choice. For documentation-only changes, do not run unit tests; use applicable documentation checks when available. For configuration-only changes, select tests according to the behavior the configuration can affect. Log the scope, selection rationale, commands, results, evidence, and gaps. If a test cannot be authored or run, record why, alternative verification, and remaining risk; never report an unrun test as passing.
 
 For financial, time-series, recommendation, or model work, verification cases may be called backtests and must specify a fixed dataset, parameters, metrics, and reproducible execution command. For ordinary business software, use verification, acceptance, replay, or regression cases instead. Run unit tests selected from impact analysis when code behavior changes; documentation-only changes use applicable documentation checks instead.
+
+After implementation, use the review and acceptance workflow when the task or risk calls for it. Review findings first and keep fixes separate unless they are within the authorized task. Map each requirement to an acceptance criterion, implementation location, evidence, and status. For a reported defect, use the targeted-repair workflow to establish a reproducer, validate a root-cause hypothesis, make the smallest justified change, and leave the result pending until verification evidence exists. Ask the user only when an unresolved choice changes scope, behavior, or another material project decision.
 
 ## Decision standard
 

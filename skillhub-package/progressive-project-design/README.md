@@ -13,10 +13,12 @@ A progressive project-design Skill for AI coding agents. It combines Just-in-Tim
 - **Stop at the current artifact:** Do not pre-design later scope.
 - **Calibrate after implementation:** Update documents from code, tests, configuration, and observed behavior.
 - **Maintain two-way relationships:** Record code locations, dependencies, and backlinks in module documents.
+- **Review and accept with evidence:** Map requirements to acceptance criteria, implementation locations, and verification evidence; use a focused repair workflow for reported defects.
+- **Keep generated project docs local:** Ignore `.ppd/` in the consuming project's `.gitignore`; do not stage or commit it.
 
 ## Progressive loading
 
-`SKILL.md` is the routing entry point. Detailed workflows are split into `references/` and should be loaded only for the current task: initialization, existing-project analysis, directory-structure analysis, requirements, slice planning, verification/backtesting, implementation logs, calibration, navigation, and snapshots.
+`SKILL.md` is the routing entry point. Detailed workflows are split into `references/` and should be loaded only for the current task: initialization, existing-project analysis, directory-structure analysis, requirements, slice planning, verification/backtesting, implementation logs, code review and acceptance, targeted repair, calibration, navigation, and snapshots.
 
 Two required artifacts are part of the workflow:
 
@@ -55,12 +57,12 @@ On first use, it checks existing structure and creates only the necessary skelet
 | Skeleton | Project initialization | `.ppd/README.md` and minimum directories |
 | Requirements | Boundaries are confirmed | Positioning, scope, decisions, and non-goals |
 | Slice start | A slice is ready to begin | Relevant technology decisions (if any), module L1 documents, verification cases, roadmap entry |
-| Implementation | A meaningful change occurs | Impact scope, selected tests, commands and results, decision reason, and remaining issues |
+| Implementation | A meaningful change occurs | Impact scope, selected tests, commands and results, decision reason, and remaining issues; review and requirement acceptance when appropriate |
 | Calibration | Slice implementation finishes | D3→D4, code locations, deviations, and backlinks |
 
 ## Verification and tests
 
-For behavior changes, add or update unit tests for changed logic and relevant boundary or failure cases. If behavior cannot reasonably be isolated in a unit test, use the most appropriate available test level and record why. After implementation, analyze affected units, interfaces, dependencies, and callers; run the changed unit's tests and relevant regressions, widening to the affected module or package suite for cross-unit changes. Record the scope, test choice, commands, results, and evidence. If a test cannot be authored or run, record why, alternative verification, and remaining risk. Documentation-only changes use applicable documentation checks instead of unit tests. See the [verification workflow](references/verification-and-backtest.md).
+For behavior changes, add or update unit tests for changed logic and relevant boundary or failure cases. If behavior cannot reasonably be isolated in a unit test, use the most appropriate available test level and record why. After implementation, analyze affected units, interfaces, dependencies, and callers; run the changed unit's tests and relevant regressions, widening to the affected module or package suite for cross-unit changes. Record the scope, test choice, commands, results, and evidence. If a test cannot be authored or run, record why, alternative verification, and remaining risk. Documentation-only changes use applicable documentation checks instead of unit tests. For risk-appropriate review and a requirement-to-evidence acceptance matrix, see [review and acceptance](references/review-and-acceptance.md); for a reported defect, see [targeted repair](references/targeted-repair.md). A repair remains pending until verification evidence is available.
 
 ## Use cases
 
@@ -95,6 +97,8 @@ Example prompts:
 $progressive-project-design Inspect this project's progressive-design state and report the smallest justified next step
 $progressive-project-design Summarize the current project's directory structure
 $progressive-project-design Plan the next vertical slice and define its verification cases
+$progressive-project-design Review this slice and map each requirement to its acceptance evidence
+$progressive-project-design Diagnose this failure, find the root cause, and make the smallest verified repair
 $progressive-project-design Calibrate the module documents affected by the current slice
 ```
 

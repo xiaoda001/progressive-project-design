@@ -55,6 +55,14 @@ Path: `.ppd/03-plan/<slice>-verification.md`
 | S1-V4 | regression | Existing behavior, when applicable | ... | ... | planned/TBD | planned/TBD | ... | pending |
 
 Allowed statuses: `pending`, `passed`, `failed`, `not run`, `not applicable`. Attach evidence to passed cases and a reason to `not run` or `not applicable` cases. Finalize planned/TBD test locations and commands during implementation.
+
+## Requirement acceptance mapping
+
+| Requirement | Acceptance criterion | Implementation location | Evidence | Status |
+|---|---|---|---|---|
+| ... | Observable and checkable result | path#line | test or runtime evidence | pending |
+
+Use the same statuses as verification cases. A passed requirement needs evidence; a requirement not run or not applicable needs a reason.
 ```
 
 For time-series, trading, recommendation, or model work, also record dataset version, time window, parameters, metrics, thresholds, baseline, and reproducibility controls.
