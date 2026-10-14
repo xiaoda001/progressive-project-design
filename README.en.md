@@ -1,6 +1,6 @@
 # Progressive Project Design
 
-[Simplified Chinese](README.md) | English
+[Simplified Chinese](README.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 A progressive project-design Skill for AI coding agents. It combines Just-in-Time Design, vertical slices, and code-to-document calibration so documentation evolves with implementation without turning into Big Design Up Front.
 
@@ -66,8 +66,8 @@ For behavior changes, add or update unit tests for changed logic and relevant bo
 
 ## Use cases
 
-- Establish lightweight, evolvable architecture documentation.
-- Summarize an existing project's directory structure and implementation boundaries.
+- Establish lightweight, evolvable architecture documentation for a new project.
+- Summarize an existing project’s directory structure and implementation boundaries.
 - Adopt the method in an existing project while preserving README, ADR, and RFC conventions.
 - Plan verifiable end-to-end vertical slices.
 - Define acceptance, replay, regression, or backtest cases before implementation.
@@ -78,10 +78,10 @@ For behavior changes, add or update unit tests for changed logic and relevant bo
 
 ## Installation
 
-Copy this prompt into your AI coding agent:
+Use this prompt in your AI coding agent:
 
 ```text
-请从 https://github.com/xiaoda001/progressive-project-design 安装此 Skill
+Install the Progressive Project Design Skill from https://github.com/xiaoda001/progressive-project-design
 ```
 
 ## Usage steps
@@ -95,7 +95,8 @@ Example prompts:
 
 ```text
 $progressive-project-design Inspect this project's progressive-design state and report the smallest justified next step
-$progressive-project-design Summarize the current project's directory structure
+$progressive-project-design Summarize the current project’s directory structure
+$progressive-project-design Create the minimum .ppd documentation skeleton for this new project
 $progressive-project-design Plan the next vertical slice and define its verification cases
 $progressive-project-design Review this slice and map each requirement to its acceptance evidence
 $progressive-project-design Diagnose this failure, find the root cause, and make the smallest verified repair
