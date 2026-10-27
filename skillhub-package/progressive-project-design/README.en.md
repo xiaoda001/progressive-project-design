@@ -9,11 +9,13 @@ A progressive project-design Skill for AI coding agents. It combines Just-in-Tim
 > Documentation is an output of decisions, not their starting point.
 
 - **Design on demand:** Detail only what the current decision or slice needs.
+- **Align requirements iteratively:** Make material open decisions visible, ask the user, and update the shared summary until the user confirms alignment.
 - **Slice-driven delivery:** Design around the smallest runnable, verifiable end-to-end loop.
 - **Stop at the current artifact:** Do not pre-design later scope.
 - **Calibrate after implementation:** Update documents from code, tests, configuration, and observed behavior.
 - **Maintain two-way relationships:** Record code locations, dependencies, and backlinks in module documents.
 - **Review and accept with evidence:** Map requirements to acceptance criteria, implementation locations, and verification evidence; use a focused repair workflow for reported defects.
+- **Preserve test integrity:** Derive expectations from the confirmed spec, require meaningful assertions, and never weaken checks to manufacture a pass; report actual execution evidence.
 - **Keep generated project docs local:** Ignore `.ppd/` in the consuming project's `.gitignore`; do not stage or commit it.
 
 ## Progressive loading
@@ -50,12 +52,13 @@ The Skill uses `.ppd/` as its progressive-documentation entry point:
 
 On first use, it checks existing structure and creates only the necessary skeleton. Existing codebases use reverse calibration: extract modules, interfaces, data models, dependencies, and the current directory structure from implementation, then document one slice at a time.
 
-## Five-stage rhythm
+## Six-stage rhythm
 
 | Stage | Trigger | Output |
 |---|---|---|
 | Skeleton | Project initialization | `.ppd/README.md` and minimum directories |
 | Requirements | Boundaries are confirmed | Positioning, scope, decisions, and non-goals |
+| Solution and spec | Requirements are aligned | Architecture boundaries, confirmed feature spec, acceptance scenarios, and slice mapping |
 | Slice start | A slice is ready to begin | Relevant technology decisions (if any), module L1 documents, verification cases, roadmap entry |
 | Implementation | A meaningful change occurs | Impact scope, selected tests, commands and results, decision reason, and remaining issues; review and requirement acceptance when appropriate |
 | Calibration | Slice implementation finishes | D3→D4, code locations, deviations, and backlinks |
@@ -87,23 +90,23 @@ Install the Progressive Project Design Skill from https://github.com/xiaoda001/p
 ## Usage steps
 
 1. Open the project in your coding agent.
-2. Invoke `$progressive-project-design` and describe the task. Say whether this is a new or existing project.
+2. Invoke this Skill using the active coding agent's supported entry point and describe the task. Say whether this is a new or existing project.
 3. Review the current stage's output. The Skill checks `.ppd/` and available project evidence, then handles only the next relevant stage.
 4. When ready, invoke it again with the next task, such as planning a slice, implementing it, or calibrating its documents.
 
 Example prompts:
 
 ```text
-$progressive-project-design Inspect this project's progressive-design state and report the smallest justified next step
-$progressive-project-design Summarize the current project’s directory structure
-$progressive-project-design Create the minimum .ppd documentation skeleton for this new project
-$progressive-project-design Plan the next vertical slice and define its verification cases
-$progressive-project-design Review this slice and map each requirement to its acceptance evidence
-$progressive-project-design Diagnose this failure, find the root cause, and make the smallest verified repair
-$progressive-project-design Calibrate the module documents affected by the current slice
+Inspect this project's progressive-design state and report the smallest justified next step
+Summarize the current project’s directory structure
+Create the minimum .ppd documentation skeleton for this new project
+Plan the next vertical slice and define its verification cases
+Review this slice and map each requirement to its acceptance evidence
+Diagnose this failure, find the root cause, and make the smallest verified repair
+Calibrate the module documents affected by the current slice
 ```
 
-In Claude Code, use the slash form, for example: `/progressive-project-design Inspect this project`.
+Skill invocation varies by coding agent. Use the entry point supported by the active agent; the workflow does not depend on a specific command format or product configuration.
 
 ## Repository structure
 
