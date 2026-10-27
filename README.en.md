@@ -20,7 +20,7 @@ A progressive project-design Skill for AI coding agents. It combines Just-in-Tim
 
 ## Progressive loading
 
-`SKILL.md` is the routing entry point. Detailed workflows are split into `references/` and should be loaded only for the current task: initialization, existing-project analysis, directory-structure analysis, requirements, slice planning, verification/backtesting, implementation logs, code review and acceptance, targeted repair, calibration, navigation, and snapshots.
+`SKILL.md` is the routing entry point. Detailed workflows are split into `references/` and should be loaded only for the current task: initialization, existing-project analysis, directory-structure analysis, requirements confirmation, solution design and spec, slice planning, verification/backtesting, implementation logs, code review and acceptance, targeted repair, calibration, navigation, and snapshots. Load the AI-agent delivery-loop reference when designing agent-enabled delivery workflows.
 
 Two required artifacts are part of the workflow:
 
