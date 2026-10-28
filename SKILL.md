@@ -3,64 +3,64 @@ name: progressive-project-design
 description: 面向 AI 编程代理的渐进式项目设计技能：通过按需设计、垂直切片和代码文档校准，帮助项目随实现逐步演进，避免过度前置设计。
 ---
 
-# Progressive Project Design
+# 渐进式项目设计
 
-Always respond in the user's language. This skill treats documentation as an output of decisions, not as Big Design Up Front.
+始终使用用户所用的语言回复。本 Skill 将文档视为决策的产物，而不是大设计先行（Big Design Up Front）的结果。
 
-## Operating principles
+## 工作原则
 
-- Design only what the current decision or vertical slice needs.
-- Use the smallest runnable, verifiable end-to-end slice as the planning unit.
-- Keep uninvolved modules at D0; do not pre-design later scope.
-- Stop after the current stage's artifact. Continue only when a new trigger exists.
-- Treat existing code as the source of truth during reverse calibration.
-- Treat agent-enabled delivery as an end-to-end workflow: capture intent, review a bounded plan, verify outputs, enforce risk-appropriate human decisions, and feed operational evidence back into planning.
-- Keep the workflow portable across coding agents. Define shared artifacts, decisions, and checks independently of any agent's product-specific files or features; adapt only the execution mechanism to the active agent's documented capabilities.
-- Confirm requirements through an iterative question-and-validation loop. Make material decision branches visible, update the shared understanding after each answer, and do not treat silence as approval.
-- Treat tests as contract evidence, not a green-check target: derive expectations from the confirmed spec, require meaningful assertions and risk-relevant boundaries, and never invent or misstate execution results.
-- Calibrate only affected documents; separate observed implementation facts from accepted intent, expose unresolved mismatches, and withhold D4 when applicable verification is pending.
-- Keep generated `.ppd/` project documentation local. Ensure the project-root `.gitignore` excludes `.ppd/`, preserving existing rules or creating the file when needed. Do not stage, commit, or upload `.ppd/`. If `.ppd/` files are already tracked, report that ignore rules do not untrack them; do not change the Git index without an explicit request.
+- 只设计当前决策或垂直切片所需的内容。
+- 以最小的、可运行且可验证的端到端切片作为规划单位。
+- 未涉及的模块保持在 D0；不要预先设计后续范围。
+- 完成当前阶段的产物后就停止；只有出现新的触发条件时才继续。
+- 进行逆向校准时，以现有代码为事实依据。
+- 将 agent 参与的交付视为端到端工作流：记录意图、评审有明确范围的计划、验证产出、按风险决定是否需要人工决策，并将运行证据反馈到规划中。
+- 让工作流可在不同编程代理间移植。共享的产物、决策和检查应独立于特定代理产品的文件或功能；只根据当前代理已记录的能力调整执行方式。
+- 通过迭代提问与验证来确认需求。明确展示会导致不同决策的分支，每次收到回答后更新共同理解；不要把沉默视为批准。
+- 将测试视为契约证据，而不是追求全绿的目标：根据已确认的规格推导预期，要求断言有实际辨别力并覆盖相关风险边界，绝不编造或误报执行结果。
+- 只校准受影响的文档；区分观察到的实现事实与已接受的意图，明确指出尚未解决的偏差；适用时，在验证仍待完成的情况下不得标记为 D4。
+- 将生成的 `.ppd/` 项目文档保留在本地。确保项目根目录的 `.gitignore` 忽略 `.ppd/`，同时保留已有规则；若文件不存在则创建。如果 `.ppd/` 文件已经被 Git 跟踪，说明忽略规则不会取消跟踪；未经明确请求，不得更改 Git 索引。
 
-## Status model
+## 状态模型
 
-| Dimension | Values | Meaning |
+| 维度 | 取值 | 含义 |
 |---|---|---|
-| Documentation maturity | D0 → D1 → D2 → D3 → D4 | unregistered → draft → approved → implementing → calibrated |
-| Design depth | L0 → L1 → L2 | boundary → current-slice detail → full relevant detail |
+| 文档成熟度 | D0 → D1 → D2 → D3 → D4 | 未登记 → 草稿 → 已批准 → 实现中 → 已校准 |
+| 设计深度 | L0 → L1 → L2 | 边界 → 当前切片细节 → 当前范围内的完整细节 |
 
-Use `D4-reverse-engineered` for documentation extracted from implemented code until its scope and behavior have been checked. Use L2 only when the current work requires edge cases, failure handling, performance, or similar constraints.
+从已实现代码中提取的文档，在范围和行为经过核对前使用 `D4-reverse-engineered` 标记。只有当前工作确实需要边界情况、故障处理、性能等约束时才使用 L2。
 
-## Progressive disclosure and routing
+## 渐进披露与任务路由
 
-Read only the reference needed for the current task. Do not load every reference by default.
+只读取当前任务所需的参考文档。默认不要加载所有参考文档。
 
-| User intent or project state | Read next |
+| 用户意图或项目状态 | 接下来读取 |
 |---|---|
-| First activation or missing `.ppd/` | [initialization.md](references/initialization.md), then [directory-structure.md](references/directory-structure.md) |
-| Existing project without reliable `.ppd/` | [migration.md](references/migration.md), [existing-project.md](references/existing-project.md), then [directory-structure.md](references/directory-structure.md) |
-| Confirming requirements | [requirements-confirmation.md](references/requirements-confirmation.md) |
-| Turning aligned requirements into architecture, a feature spec, and functional slices | [solution-design-and-spec.md](references/solution-design-and-spec.md), then [slice-planning.md](references/slice-planning.md) |
-| Planning or starting a slice | [slice-planning.md](references/slice-planning.md), [verification-and-backtest.md](references/verification-and-backtest.md) |
-| Implementing a slice | [implementation-log.md](references/implementation-log.md) |
-| Reviewing or accepting an implementation | [review-and-acceptance.md](references/review-and-acceptance.md) |
-| Diagnosing and fixing a reported defect | [targeted-repair.md](references/targeted-repair.md) |
-| Asking what to do next | [task-navigation.md](references/task-navigation.md) |
-| Designing an AI-agent delivery workflow, evaluating agent behavior, or closing the production-feedback loop | [agent-delivery-loop.md](references/agent-delivery-loop.md), then load only the relevant slice, verification, review, or calibration reference |
-| Slice completed or docs drifted | [calibration.md](references/calibration.md) |
-| Asking for project state | [project-snapshot.md](references/project-snapshot.md) |
-| Creating or updating a `.ppd/` artifact | Read only the matching section in [templates.md](references/templates.md); for structure or verification artifacts also read [structure-and-verification-templates.md](references/structure-and-verification-templates.md) |
+| 首次启用或缺少 `.ppd/` | [initialization.md](references/initialization.md)，然后 [directory-structure.md](references/directory-structure.md) |
+| 已有项目，但缺少可靠的 `.ppd/` | [migration.md](references/migration.md)、[existing-project.md](references/existing-project.md)，然后 [directory-structure.md](references/directory-structure.md) |
+| 确认需求 | [requirements-confirmation.md](references/requirements-confirmation.md) |
+| 将已对齐的需求转化为架构、功能规格和功能切片 | [solution-design-and-spec.md](references/solution-design-and-spec.md)，然后 [slice-planning.md](references/slice-planning.md) |
+| 规划或启动切片 | [slice-planning.md](references/slice-planning.md)、[verification-and-backtest.md](references/verification-and-backtest.md) |
+| 实现切片 | [implementation-log.md](references/implementation-log.md) |
+| 评审或验收实现 | [review-and-acceptance.md](references/review-and-acceptance.md) |
+| 诊断并修复已报告的缺陷 | [targeted-repair.md](references/targeted-repair.md) |
+| 询问下一步做什么 | [task-navigation.md](references/task-navigation.md) |
+| 设计 AI agent 交付工作流、评估 agent 行为或建立生产反馈闭环 | [agent-delivery-loop.md](references/agent-delivery-loop.md)，然后只加载相关的切片、验证、评审或校准参考文档 |
+| 切片已完成或文档与实现出现偏差 | [calibration.md](references/calibration.md) |
+| 询问项目状态 | [project-snapshot.md](references/project-snapshot.md) |
+| 创建或更新 `.ppd/` 产物 | 只读取 [templates.md](references/templates.md) 中对应的章节；结构或验证类产物还需读取 [structure-and-verification-templates.md](references/structure-and-verification-templates.md) |
 
-## First activation decision tree
+## 首次启用决策流程
 
-1. Check whether the project root contains `.ppd/`.
-2. Ensure the project-root `.gitignore` excludes `.ppd/`, preserving existing ignore rules or creating the file when needed. If `.ppd/` files are already tracked, report this because ignore rules do not untrack existing files; do not change the Git index without an explicit request.
-3. If it is a new project, create only the skeleton and stop.
-4. If code already exists and `.ppd/` is missing or stale, perform one reverse-analysis pass and create clearly marked draft/reverse-engineered artifacts; do not redesign implemented behavior.
-5. If `.ppd/` is healthy, read the project snapshot and continue at the current stage; do not repeat initialization.
+1. 检查项目根目录是否包含 `.ppd/`。
+2. 确保项目根目录的 `.gitignore` 忽略 `.ppd/`，保留已有忽略规则；若文件不存在则创建。如果 `.ppd/` 文件已经被 Git 跟踪，说明忽略规则不会取消跟踪；未经明确请求，不得更改 Git 索引。
+3. 如果是新项目，只创建骨架，然后停止。
+4. 如果已有代码但缺少 `.ppd/` 或其内容已过时，进行一轮逆向分析，创建明确标为草稿或逆向工程的产物；不要重新设计已经实现的行为。
+5. 如果 `.ppd/` 状态良好，读取项目快照并从当前阶段继续；不要重复初始化。
 
-For new features or substantial changes, use this order after requirements align: define architecture boundaries, write and confirm the feature spec, identify high-level acceptance scenarios, decompose the spec into functional vertical slices, then plan and implement one slice at a time. Keep architecture at L0/L1 for unstarted scope; deepen only the active slice. Small fixes may use a concise inline spec and go directly to targeted repair.
+需求达成一致后，新功能或较大改动按以下顺序推进：定义架构边界，编写并确认功能规格，识别高层验收场景，将规格拆解为功能垂直切片，然后逐个规划和实现切片。尚未开始的范围，其架构深度保持在 L0/L1；仅加深当前切片。小型修复可以使用简洁的内联规格，直接进入定点修复流程。
 
-The initial directory skeleton is:
+初始目录骨架如下：
 
 ```text
 .ppd/
@@ -72,40 +72,40 @@ The initial directory skeleton is:
 └── 05-modules/
 ```
 
-Do not create future slice directories until the slice is registered in the roadmap.
+路线图登记某个切片之前，不要创建该切片的后续目录。
 
-## Required slice invariant
+## 切片必须满足的条件
 
-Before implementing a slice, record:
+实现切片之前，记录以下内容：
 
-- a completion condition: what can run or be demonstrated;
-- applicable verification cases: the main success path, a relevant boundary case, a failure/recovery case, and a regression case when prior behavior exists;
-- planned unit-test coverage for new or changed behavior. Name the expected test file/case and command when known; if implementation details are not yet known, mark them as planned or `TBD` and finalize them during implementation.
+- 完成条件：哪些内容可以运行或演示；
+- 适用的验证用例：主要成功路径、相关边界情况、失败与恢复场景；若存在既有行为，还要包含回归用例；
+- 新增或变更行为的单元测试计划。已知时写明预期的测试文件、用例和命令；若实现细节尚不明确，先标为计划中或 `TBD`，并在实现期间补全。
 
-Add or update unit tests for behavior changes, following repository conventions and covering changed logic plus relevant boundary and failure behavior. Derive test expectations from the confirmed contract, not solely from implementation. Assertions must detect meaningful regressions; do not weaken or skip checks just to obtain a passing run. If the behavior cannot reasonably be isolated in a unit test, use the most appropriate available test level and record why. Do not add a new test framework outside the slice's scope without justification. Read [verification-and-backtest.md](references/verification-and-backtest.md) for test-integrity checks.
+行为发生变化时，遵循仓库惯例新增或更新单元测试，覆盖变更逻辑以及相关的边界和失败行为。测试预期应从已确认的契约推导，而不能只依据实现。断言必须能发现有意义的回归；不得仅为获得通过结果而放宽或跳过检查。如果行为不适合单独进行单元测试，则使用最合适的测试层级并记录原因。没有充分理由时，不要在切片范围之外引入新的测试框架。测试完整性检查见 [verification-and-backtest.md](references/verification-and-backtest.md)。
 
-After implementation, analyze the impact scope of code or behavior changes before verification. Identify changed units, interfaces, dependencies, existing callers, and prior behavior. For a change contained within one unit, run that unit's tests and relevant regressions. For cross-unit or interface changes, include affected dependents and the relevant module or package suite. Use the full repository suite when a shared/core contract affects multiple areas, or when no bounded suite provides meaningful coverage; if impact remains unclear after investigation, run the broadest bounded relevant suite and explain the choice. For documentation-only changes, do not run unit tests; use applicable documentation checks when available. For configuration-only changes, select tests according to the behavior the configuration can affect. Log the scope, selection rationale, commands, results, evidence, and gaps. If a test cannot be authored or run, record why, alternative verification, and remaining risk; never report an unrun test as passing.
+实现后、验证前，先分析代码或行为变更的影响范围。识别变更的单元、接口、依赖、现有调用方和既有行为。若变更仅限于一个单元，运行该单元的测试及相关回归测试；若涉及多个单元或接口，则覆盖受影响的依赖方以及相关模块或包的测试。当共享或核心契约影响多个区域，或没有范围适当的测试集能够提供有效覆盖时，运行完整仓库测试套件。如果调查后影响范围仍不明确，运行范围最广且相关的测试集，并说明选择理由。纯文档变更不运行单元测试；有适用的文档检查时则运行这些检查。配置变更应根据配置可能影响的行为选择测试。记录影响范围、测试选择理由、命令、结果、证据和缺口。如果无法编写或运行测试，记录原因、替代验证方式和剩余风险；绝不把未运行的测试报告为通过。
 
-For financial, time-series, recommendation, or model work, verification cases may be called backtests and must specify a fixed dataset, parameters, metrics, and reproducible execution command. For ordinary business software, use verification, acceptance, replay, or regression cases instead. Run unit tests selected from impact analysis when code behavior changes; documentation-only changes use applicable documentation checks instead.
+对于金融、时间序列、推荐或模型相关工作，验证用例可以采用回测格式，并须指定固定数据集、参数、指标和可复现的执行命令。普通业务软件应使用验证、验收、回放或回归用例。代码行为发生变化时，根据影响分析运行所选单元测试；纯文档变更则运行适用的文档检查。
 
-After implementation, use the review and acceptance workflow when the task or risk calls for it. Review findings first and keep fixes separate unless they are within the authorized task. Map each requirement to an acceptance criterion, implementation location, evidence, and status. For a reported defect, use the targeted-repair workflow to establish a reproducer, validate a root-cause hypothesis, make the smallest justified change, and leave the result pending until verification evidence exists. Ask the user only when an unresolved choice changes scope, behavior, or another material project decision.
+实现后，如果任务或风险需要，使用评审与验收工作流。先记录评审发现的问题；除非修复属于已授权任务，否则将修复与本次工作分开。将每项需求对应到验收标准、实现位置、证据和状态。收到缺陷报告时，使用定点修复工作流建立复现方式、验证根因假设、做出范围最小且有依据的改动，并在验证证据产生前保持待验证状态。只有尚未解决的选择会改变范围、行为或其他重要项目决策时，才向用户提问。
 
-## Decision standard
+## 文档决策标准
 
-Before writing any document, answer:
+编写任何文档前，先回答：
 
-> Who will read it? When will they read it? What decision will they make after reading it?
+> 谁会阅读它？他们会在什么时候阅读？阅读后要做出什么决定？
 
-If those answers are unclear, do not create the document yet.
+如果这些问题尚不清楚，暂时不要创建文档。
 
-## Agent portability
+## Agent 可移植性
 
-This Skill is for coding agents across products, including Codex, Claude Code, Trae, and others. Treat the workflow and project artifacts as the portable contract. Do not require a specific agent, model, configuration filename, plugin, tool protocol, or vendor feature. Before using an agent-specific capability, confirm it is available in the active environment and provide a tool-agnostic fallback when practical. Keep project policy and source-of-truth artifacts in the project or its established systems; agent-specific instructions may only adapt how the shared workflow is executed and must not redefine it.
+此 Skill 面向不同产品的编程代理，包括 Codex、Claude Code、Trae 等。将工作流和项目产物视为可移植的约定。不要要求使用特定代理、模型、配置文件名、插件、工具协议或厂商功能。使用代理专属能力前，先确认当前环境提供了该能力；可行时提供与工具无关的备用方式。项目策略和事实来源应保存在项目或其既定系统中；代理专属指令只能调整共享工作流的执行方式，不得重新定义工作流。
 
-## Relationship invariants
+## 文档关系约束
 
-- `.ppd/README.md` is the single navigation entry point.
-- Module documents contain responsibility, interfaces, dependencies, code locations, and backlinks.
-- Code links must use `path#line` and be updated during calibration.
-- D4 claims require implementation evidence; a filename alone is not evidence.
-- A calibration aligns only affected documents with accepted scope and evidence; it must not silently add scope, hide spec mismatches, or promote unverified behavior to D4.
+- `.ppd/README.md` 是唯一的导航入口。
+- 模块文档包含职责、接口、依赖、代码位置和反向链接。
+- 代码链接使用 `path#line` 格式，并在校准时更新。
+- 声明 D4 必须有实现证据；仅有文件名不能作为证据。
+- 校准只让受影响的文档与已接受的范围及证据保持一致；不得暗中增加范围、掩盖规格偏差，或将未经验证的行为提升为 D4。
