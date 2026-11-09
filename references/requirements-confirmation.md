@@ -9,6 +9,16 @@ Use this before writing or promoting the project overview. Ground questions in t
 - entities, user flow, roles, and permissions for business systems;
 - constraints, non-goals, and what would count as success.
 
+## Task framing and gap scan
+
+Start by stating whether the request is a targeted change in an existing flow, a bounded end-to-end feature, or a cross-cutting/new subsystem. Use that classification to scale discovery and documentation. It describes the work's complexity; it does not by itself require a new document or approval ceremony.
+
+Before refining details, check the relevant code, project documents, and recent changes. Build a task-specific impact map from the user's workflow and existing boundaries. Consider users and roles, UI/API/service layers and callers, data lifecycle/history/audit and state transitions, side effects and integrations, concurrency and failure/recovery behavior, compatibility and migrations, deployment/operations, and verification. Include only areas that could affect this request. Record observed facts separately from assumptions and open decisions; explicitly mark important areas as out of scope or not applicable where useful.
+
+Give the user a compact framing that helps improve the request: desired outcome, proposed scope, likely affected modules/interfaces, relevant omissions or risks, non-goals, success criteria, and material decisions still open. For broad feature requests, surface the highest-impact relevant gaps in the first framing instead of only promising to inspect them later. Make additions concrete (for example, “status changes also notify assignees,” “record who changed status and when,” “failed updates can be retried safely,” or “existing mobile clients must remain compatible”) and explain why each matters. Label each as confirmed impact, risk to verify, or optional scope so a possible concern is not silently turned into a requirement. Do not expand the task merely because an adjacent feature exists.
+
+If the request spans multiple independent subsystems, identify the pieces, their dependencies, and a sensible order before asking detailed feature questions. Recommend starting with one coherent vertical slice unless the user's goal requires a broader first release. When discovery reveals new cross-module impact, reclassify the task and present the changed scope before proceeding.
+
 ## Question and decision-tree loop
 
 1. List the material decisions that remain unresolved. Separate facts supported by project evidence from assumptions and user choices.
