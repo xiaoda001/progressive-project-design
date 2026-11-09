@@ -46,11 +46,15 @@ The Skill uses `.ppd/` as its progressive-documentation entry point:
 ├── 01-overview/
 ├── 02-architecture/
 ├── 03-plan/
-├── 04-progress/<slice>/
+├── 04-progress/
+│   ├── <slice>/       # slice progress records
+│   └── repairs/       # optional reusable standalone repairs
+│       ├── README.md
+│       └── YYYY-MM-DD-<slug>.md
 └── 05-modules/
 ```
 
-On first use, it checks existing structure and creates only the necessary skeleton. Existing codebases use reverse calibration: extract modules, interfaces, data models, dependencies, and the current directory structure from implementation, then document one slice at a time.
+`.ppd/README.md` remains the only root navigation entry. Create `04-progress/repairs/README.md` only when reusable standalone repairs need an index, and link it from the root README. Repairs within a slice stay in that slice's logs. On first use, the Skill checks existing structure and creates only the necessary skeleton. Existing codebases use reverse calibration: extract modules, interfaces, data models, dependencies, and the current directory structure from implementation, then document one slice at a time.
 
 ## Six-stage rhythm
 

@@ -13,6 +13,10 @@ Create `.ppd/01-overview/project-structure.md` with:
 
 Use `D4-reverse-engineered` only for behavior supported by code, tests, configuration, or observed execution. Do not reorganize the project merely to match a recommended architecture.
 
+## Standalone repair records
+
+Create `.ppd/04-progress/repairs/README.md` only when the first durable standalone repair needs an index. Store reusable repair notes beside the index as `.ppd/04-progress/repairs/YYYY-MM-DD-<slug>.md`, and link the index from `.ppd/README.md`. Repairs already covered by an active slice stay in that slice's progress records; trivial corrections do not require a new repair note.
+
 ## New project
 
 After requirements are confirmed and technology choices are compared, propose two or three directory shapes when the choice is meaningful. For each option state:
